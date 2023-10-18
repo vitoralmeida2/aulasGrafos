@@ -2,12 +2,10 @@
 
 using namespace std;
 
-No::No(int name) {
-    int idNo;
-    int pesoNo;
-    int grauEntrada;
-    int grauSaida;
+// --- CONSTRUTOR E DESTRUTOR ---
 
+No::No(int name)
+{
     this->idNo = name;
     this->pesoNo = 0;
     this->grauEntrada = 0;
@@ -26,77 +24,85 @@ No::No(int name, int peso) {
 }
 
 No::~No() {
-    Aresta* auxEdge = getPrimeiraAresta();
-    while ( auxEdge != NULL ) {
-        Aresta* auxNextEdge = auxEdge->getProxAresta();
-        delete( auxEdge );
+    Aresta *auxEdge = getPrimeiraAresta();
+    while (auxEdge != NULL) 
+    {
+        Aresta *auxNextEdge = auxEdge->getProxAresta();
+        delete(auxEdge);
         auxEdge = auxNextEdge;       
     }
-    delete( searchInfo );
 }
 
-void No::setIdNo(int valor) {
+// --- SET ---
+
+void No::setIdNo(int valor) 
+{
     this->idNo = valor;
 }
-int No::getIdNo() {
+
+void No::setPesoNo(int valor)
+{
+    this->pesoNo = valor;
+}
+
+void No::incGrauEntrada()
+{
+    this->grauEntrada++;
+}
+
+void No::decGrauEntrada()
+{
+    this->grauEntrada--;
+}
+
+void No::incGrauSaida()
+{
+    this->grauSaida++;
+}
+
+void No::decGrauSaida()
+{
+    this->grauSaida--;
+}
+
+void No::setProxNo(No *novoNo)
+{
+    this->proxNo = novoNo;
+}
+
+void No::setPrimeiraAresta(Aresta *novaAresta)
+{
+    this->primeiraAresta = novaAresta;
+}
+
+// --- GET ---
+
+int No::getIdNo() 
+{
     return this->idNo;
 }
 
-
-}
-
-
-
-void No::setPeso(int valor) {
-    this->pesoNo = valor;
-}
-int No::getPeso() {
+int No::getPeso() 
+{
     return this->pesoNo;
 }
 
-int No::getGrau() {
-    return this->grauSaida;
-}
-void No::incGrau() {
-    this->grauEntrada++;
-    this->grauSaida++;
-}
-void No::decGrau() {
-    this->grauEntrada--;
-    this->grauSaida--;
-}
-
-int No::getGrauEntrada() {
+int No::getGrauEntrada()
+{
     return this->grauEntrada;
 }
-void No::incrementaGrauEntrada() {
-    this->grauEntrada++;
-}
-void No::decrementaGrauEntrada() {
-    this->grauEntrada--;
-}
 
-int No::getGrauSaida() {
+int No::getGrauSaida()
+{
     return this->grauSaida;
 }
-void No::incrementaGrauSaida() {
-    this->grauSaida++;
-}
-void No::decrementaGrauSaida() {
-    this->grauSaida--;
-}
 
-void No::setProxNo(No *novoNo) {
-    this->proxNo = novoNo;
-}
-No* No::getProxNo(){
+No *No::getProxNo()
+{
     return this->proxNo;
 }
 
-void No::setPrimeiraAresta(Aresta *novaAresta) {
-    this->primeiraAresta = novaAresta;
-}
-Aresta* No::getPrimeiraAresta(){
+Aresta *No::getPrimeiraAresta()
+{
     return this->primeiraAresta;
 }
-

@@ -5,82 +5,50 @@
 
 using namespace std;
 
-/**
- * Construtor. Os valores padrões são:\n
- * 
- * peso = 1;
- * 
- * @param *noDestino (new valor)
- * @param *proxAresta (new valor)
- */
-Aresta::Aresta(No *noDestino, Aresta *proxAresta) {
-    this->peso = 1;
-    this->noDestino = noDestino;
-    this->proxAresta = proxAresta;
+// --- CONSTRUTOR E DESTRUTOR ---
+
+Aresta::Aresta(No *NoDest, Aresta *proxArest, int peso)
+{
+    this->NoDestino = NoDest;
+    this->proxAresta = proxArest;
+    this->pesoAresta = peso;
 }
 
-/**
- * Construtor sobrescrito.
- * 
- * @param *noDestino (new valor)
- * @param *proxAresta (new valor)
- * @param peso (new valor)
- */
-Aresta::Aresta(No *noDestino, Aresta *proxAresta, int peso) {
-    this->peso = peso;
-    this->noDestino = noDestino;
-    this->proxAresta = proxAresta;
+Aresta::~Aresta() 
+{
+    //destrutor
 }
 
-/** Destructor */
-Aresta::~Aresta() {
-    //dtor
-}
+// --- SET ---
 
-/**
- * A funcao define peso valor.
- * 
- * @param valor (new valor)
- */
-void Aresta::setPeso(int valor) {
-    this->peso = valor;
-}
-
-/**
- * A funcao retorna peso valor.
- */
-int Aresta::getPeso() {
-    return this->peso;
-}
-
-/**
- * A funcao define noDestino.
- * 
- * @param valor (new valor)
- */
-void Aresta::setNoDestino(No *valor) {
-    this->noDestino = valor;
-}
-
-/**
- * A funcao retorna noDestino.
- */
-No* Aresta::getNoDestino() {
-    return this->noDestino;
-}
-
-/**
- * A funcao define proxAresta.
- * 
- * @param valor (new valor)
- */
-void Aresta::setProxAresta(Aresta *valor) {
+void Aresta::setProxAresta(Aresta *valor)
+{
     this->proxAresta = valor;
 }
 
-/**
- * A funcao retorna proxAresta;
- */
-Aresta* Aresta::getProxAresta() {
+void Aresta::setNoDestino(No *valor)
+{
+    this->NoDestino = valor;
+}
+
+void Aresta::setPeso(int valor) 
+{
+    this->pesoAresta = valor;
+}
+
+// --- GET ---
+
+int Aresta::getPesoAresta()
+{
+    return this->pesoAresta;
+}
+
+No *Aresta::getNoDestino()
+{
+    return this->NoDestino;
+}
+
+Aresta *Aresta::getProxAresta()
+{
     return this->proxAresta;
 }

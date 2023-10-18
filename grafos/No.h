@@ -6,24 +6,42 @@
 #include "Aresta.h"
 
 using namespace std;
-class Aresta;
 
-class No {
-public:
-    No(int idNo);
-    No(int idNo, int weight);
-    virtual ~No();
 
-    int getIdNo () {return idNo;}
+// --- Defininindo class No ---
 
-private:
-    int idNo;
-    int pesoNo;
-    int grauEntrada;
-    int grauSaida;
-    No *proxNo;
-    Aresta *primeiraAresta;
-    Aresta *ultimaAresta;
+class No 
+{
+    public:
+        No(int idNo);
+        No(int idNo, int peso);
+        
+        // --- SET ---
+        void setIdNo(int idNo);
+        void setPesoNo(int valor);
+        void incGrauEntrada();
+        void decGrauEntrada();
+        void incGrauSaida();
+        void decGrauSaida();
+        void setProxNo(No *novoNo);
+        void setPrimeiraAresta(Aresta *novAresta);
+
+        // --- GET ---
+        int getIdNo();
+        int getPeso();
+        int getGrau();
+        int getGrauEntrada();
+        int getGrauSaida();
+        No *getProxNo();
+        Aresta *getPrimeiraAresta();
+
+    private:
+        int idNo;
+        int pesoNo;
+        int grauEntrada;
+        int grauSaida;
+        No *proxNo;
+        Aresta *primeiraAresta;
 };
 
 #endif // NO_H

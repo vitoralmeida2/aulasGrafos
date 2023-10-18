@@ -7,23 +7,30 @@
 
 using namespace std;
 
-class No;
+// --- Definindo class Aresta ---
 
-class Aresta {
-public:
-    Aresta(int noDestino);
-    Aresta(int noDestino, int pesoAresta);
+class Aresta 
+{
+    public:
+        Aresta(No *noDestino, Aresta *proxAresta, int peso);
+        ~Aresta();
 
-    int getPesoAresta();
+        // --- SET ---
+        void setProxAresta(Aresta *valor);
+        void setNoDestino(No *valor);
+        void setPeso(int valor);
 
-    
-    //Aresta *getProxAresta();
-    //void setProxAresta(Aresta *valor);
-    
-private:
-    int pesoAresta;
-    int idNoDestino;
-    Aresta *proxAresta;
+        // --- GET ---
+        int getPesoAresta();
+        No *getNoDestino();
+        Aresta *getProxAresta();
+
+    private:
+        int pesoAresta;
+        int idNoDestino;
+        No *NoDestino;
+        Aresta *proxAresta;
+
 };
 
 #endif // ARESTA_H
