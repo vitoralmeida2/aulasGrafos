@@ -14,7 +14,8 @@ No::No(int name)
     this->primeiraAresta = NULL;
 }
 
-No::No(int name, int peso) {
+No::No(int name, int peso) 
+{
     this->idNo = name;
     this->pesoNo = peso;
     this->grauEntrada = 0;
@@ -23,13 +24,14 @@ No::No(int name, int peso) {
     this->primeiraAresta = NULL;
 }
 
-No::~No() {
-    Aresta *auxEdge = getPrimeiraAresta();
-    while (auxEdge != NULL) 
+No::~No()
+{
+    Aresta *auxAresta = getPrimeiraAresta();
+    while (auxAresta != NULL) 
     {
-        Aresta *auxNextEdge = auxEdge->getProxAresta();
-        delete(auxEdge);
-        auxEdge = auxNextEdge;       
+        Aresta *auxNextAresta = auxAresta->getProxAresta();
+        delete auxAresta;
+        auxAresta = auxNextAresta;
     }
 }
 
@@ -43,6 +45,18 @@ void No::setIdNo(int valor)
 void No::setPesoNo(int valor)
 {
     this->pesoNo = valor;
+}
+
+void No::incGrau()
+{
+    this->grauEntrada++;
+    this->grauSaida++;
+}
+
+void No::decGrau()
+{
+    this->grauEntrada--;
+    this->grauSaida--;
 }
 
 void No::incGrauEntrada()
@@ -85,6 +99,11 @@ int No::getIdNo()
 int No::getPeso() 
 {
     return this->pesoNo;
+}
+
+int No::getGrau()
+{
+    return this->grauEntrada;
 }
 
 int No::getGrauEntrada()

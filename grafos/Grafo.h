@@ -8,6 +8,9 @@
 
 using namespace std;
 
+class No;
+class Aresta;
+
 // --- Definindo class Grafo ---
 
 class Grafo 
@@ -34,6 +37,7 @@ class Grafo
         int getNumAresta();
         No *getNoRaiz();
         int getOrdem();
+        int getGrau();
         int getGrauEntrada();
         int getGrauSaida();
         bool isDigrafo();

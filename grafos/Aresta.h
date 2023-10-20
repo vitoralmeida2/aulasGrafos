@@ -2,10 +2,11 @@
 #define ARESTA_H
 #include <iostream>
 #include <stdlib.h>
-#include <string>
 #include "No.h"
 
 using namespace std;
+
+class No;
 
 // --- Definindo class Aresta ---
 

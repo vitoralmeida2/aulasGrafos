@@ -2,10 +2,11 @@
 #define NO_H
 #include <iostream>
 #include <stdlib.h>
-#include <string>
 #include "Aresta.h"
 
 using namespace std;
+
+class Aresta;
 
 
 // --- Defininindo class No ---
@@ -15,10 +16,13 @@ class No
     public:
         No(int idNo);
         No(int idNo, int peso);
+        ~No();
         
         // --- SET ---
         void setIdNo(int idNo);
         void setPesoNo(int valor);
+        void incGrau();
+        void decGrau();
         void incGrauEntrada();
         void decGrauEntrada();
         void incGrauSaida();

@@ -4,6 +4,8 @@
 #include <sstream>
 #include <vector>
 #include "Grafo.h"
+#include "Aresta.h"
+#include "No.h"
 
 using namespace std;
 
@@ -239,8 +241,8 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
         noDestino->incGrauEntrada();
     } else
         {
-            noFonte->incGrauEntrada();
-            noDestino->incGrauEntrada();
+            noFonte->incGrau();
+            noDestino->incGrau();
         }
 
     return true;
@@ -254,18 +256,19 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
     Aresta *arestaParaRemover = noFonte->getPrimeiraAresta();
     Aresta *arestaAnterior = NULL;
 
-    while (arestaParaRemover != NULL)
+    while (arestaParaRemover != NULL) // procurando aresta
     {
-        if (arestaParaRemover->getNoDestino()->getIdNo() == idNoDestino)
+        if (arestaParaRemover->getNoDestino()->getIdNo() == idNoDestino) // aresta encontrada
         {
             // decrementa graus
-            arestaParaRemover->getNoDestino()->decGrauEntrada();
             if (isDigrafo())
             {
                 noFonte->decGrauSaida();
+                arestaParaRemover->getNoDestino()->decGrauEntrada();
             } else
                 {
-                    noFonte->decGrauEntrada();
+                    noFonte->decGrau();
+                    arestaParaRemover->getNoDestino()->decGrau();
                 }
             
             // ajusta arestas
@@ -285,6 +288,8 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
         arestaAnterior = arestaParaRemover;
         arestaParaRemover = arestaParaRemover->getProxAresta();
     }
+
+    return false; // aresta nao encontrada
 }
 
 // --- Caracteristica do Grafo ---
@@ -322,10 +327,16 @@ int Grafo::getOrdem()
     return this->ordem;
 }
 
+int Grafo::getGrau()
+{
+    return getGrauEntrada();
+}
+
 /*
     Retorna grau de entrada.
 */
-int Grafo::getGrauEntrada() {
+int Grafo::getGrauEntrada() 
+{
     int grauEntrada = 0;
     No *noAux = noRaiz;
 
