@@ -27,7 +27,7 @@ class Grafo
         // --- Funcoes do No ---
         No *procurarNoPeloId(int idFindNo);
         No *insereNo(int idNo, int pesoNo);
-        bool removeNo(int idNo, bool isDigrafo);
+        bool removeNo(int idNo);
 
         // --- Funcoes de Aresta ---
         bool insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta);

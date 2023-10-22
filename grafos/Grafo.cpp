@@ -111,7 +111,7 @@ No *Grafo::insereNo(int idNo, int peso)
     removeNo -
     Remove No do Grafo
 */
-bool Grafo::removeNo(int idNo, bool isDigrafo) 
+bool Grafo::removeNo(int idNo) 
 {
     // Pesquisa o No a ser excluido
 
@@ -124,41 +124,39 @@ bool Grafo::removeNo(int idNo, bool isDigrafo)
 
     // Remove todas as arestas/arcos onde este nó ocorre
 
-
-    if (!isDigrafo) // se nao e digrafo
+    if (isDigrafo()) // se e digrafo
     {
-        Aresta *arestaParaRemover = noParaRemover->getPrimeiraAresta();
-        Aresta *auxAresta = NULL;
-
-        while (noParaRemover->getPrimeiraAresta() != NULL) // removendo arestas 
+        No *noAux = noRaiz;
+        while (noParaRemover->getGrauEntrada() != 0 && noAux != NULL) // removendo arestas de entrada
         {
-            No *noDestino = arestaParaRemover->getNoDestino();
-            removeAresta(noParaRemover, noDestino->getIdNo());
-            removeAresta(noDestino, noParaRemover->getIdNo());
-            arestaParaRemover = noParaRemover->getPrimeiraAresta();
+            removeAresta(noAux, noParaRemover->getIdNo());
+            noAux = noAux->getProxNo();
         }
-    } else // se e digrafo
-        {
-            No *noAux = noRaiz;
-            while (noParaRemover->getGrauEntrada() != 0 && noAux != NULL) // removendo arestas de entrada
-            {
-                removeAresta(noAux, noParaRemover->getIdNo());
-                noAux = noAux->getProxNo();
-            }
 
+        Aresta *arestaParaRemover = noParaRemover->getPrimeiraAresta();
+        No *noDestino = NULL;
+
+        while (arestaParaRemover != NULL) // removendo arestas de saida
+        {
+            noDestino = arestaParaRemover->getNoDestino();
+            removeAresta(noParaRemover, noDestino->getIdNo());
+        }
+
+    } else // se nao e Digrafo
+        {
             Aresta *arestaParaRemover = noParaRemover->getPrimeiraAresta();
             No *noDestino = NULL;
 
-            while (noParaRemover->getPrimeiraAresta() != NULL)
+            while (arestaParaRemover != NULL) // removendo arestas do no
             {
                 noDestino = arestaParaRemover->getNoDestino();
                 removeAresta(noParaRemover, noDestino->getIdNo());
-                arestaParaRemover = arestaParaRemover->getProxAresta();
+                removeAresta(noDestino, noParaRemover->getIdNo());
             }
         }
 
     // Remove o no
-
+    
     No *noAux = noRaiz;
     while (noAux->getProxNo() != noParaRemover)
     {
@@ -200,6 +198,11 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
 
     Aresta *novaAresta = noFonte->getPrimeiraAresta();
 
+    while (novaAresta != NULL && novaAresta->getNoDestino()->getIdNo() != idNoDestino) // procura aresta correspondente se ela existe
+    {
+        novaAresta = novaAresta->getProxAresta();
+    }
+
     if (isDigrafo()) // se e Digrafo
     {
         if (novaAresta == NULL) // se aresta nao existe
@@ -219,6 +222,11 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 
                 Aresta *novaAresta2 = noDestino->getPrimeiraAresta(); // aresta sentido contrario
 
+                while (novaAresta2 != NULL && novaAresta2->getNoDestino()->getIdNo() != noFonte->getIdNo()) // procura aresta correspondente se ela existe
+                {
+                    novaAresta2 = novaAresta2->getProxAresta();
+                }
+
                 if (novaAresta2 == NULL) // se aresta destino -> fonte nao existe
                 {
                     novaAresta2 = new Aresta(noFonte, NULL, pesoAresta);
@@ -230,6 +238,13 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             } else // se existe
                 {
                     novaAresta->setPeso(pesoAresta);
+
+                    Aresta *auxAresta = noDestino->getPrimeiraAresta();
+                    while (auxAresta->getNoDestino()->getIdNo() != noFonte->getIdNo())
+                    {
+                        auxAresta = auxAresta->getProxAresta();
+                    }
+                    auxAresta->setPeso(pesoAresta);
                 }
         }
 
@@ -252,7 +267,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
     Remove arestas
 */
 bool Grafo::removeAresta(No *noFonte, int idNoDestino)
-{
+{   
     Aresta *arestaParaRemover = noFonte->getPrimeiraAresta();
     Aresta *arestaAnterior = NULL;
 
@@ -268,7 +283,6 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
             } else
                 {
                     noFonte->decGrau();
-                    arestaParaRemover->getNoDestino()->decGrau();
                 }
             
             // ajusta arestas
@@ -301,11 +315,11 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
 int Grafo::getNumAresta() 
 {
     No *noAux = noRaiz;
-    int numArestas = 0;
+    numAresta = 0;
 
     while (noAux != NULL) 
     {
-        numAresta = noAux->getGrau() + numAresta;
+        numAresta += noAux->getGrau();
         noAux = noAux->getProxNo();
     }
     return numAresta / 2;
