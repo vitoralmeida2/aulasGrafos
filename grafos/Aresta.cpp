@@ -10,6 +10,7 @@ using namespace std;
 Aresta::Aresta(No *NoDest, Aresta *proxArest, int peso)
 {
     this->NoDestino = NoDest;
+    this->idNoDestino = NoDest->getIdNo();
     this->proxAresta = proxArest;
     this->pesoAresta = peso;
 }
@@ -21,14 +22,15 @@ Aresta::~Aresta()
 
 // --- SET ---
 
-void Aresta::setProxAresta(Aresta *valor)
+void Aresta::setProxAresta(Aresta *proxArest)
 {
-    this->proxAresta = valor;
+    this->proxAresta = proxArest;
 }
 
-void Aresta::setNoDestino(No *valor)
+void Aresta::setNoDestino(No *novoDestino)
 {
-    this->NoDestino = valor;
+    this->NoDestino = novoDestino;
+    this->idNoDestino = novoDestino->getIdNo();
 }
 
 void Aresta::setPeso(int valor) 
@@ -41,6 +43,11 @@ void Aresta::setPeso(int valor)
 int Aresta::getPesoAresta()
 {
     return this->pesoAresta;
+}
+
+int Aresta::getIdNoDestino()
+{
+    return this->idNoDestino;
 }
 
 No *Aresta::getNoDestino()

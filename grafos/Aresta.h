@@ -23,6 +23,7 @@ class Aresta
 
         // --- GET ---
         int getPesoAresta();
+        int getIdNoDestino();
         No *getNoDestino();
         Aresta *getProxAresta();
 

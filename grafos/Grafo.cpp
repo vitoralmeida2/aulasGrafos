@@ -52,8 +52,8 @@ void Grafo::decOrdem()
 
 /*  procuraNoPeloId -
     Procura pelo No pelo seu ID
-    se encontrar - return true
-    se nao encontrar - return false
+    retorna o No se encontrar
+    retorna NULL se nao encontrar
 */
 No *Grafo::procurarNoPeloId(int idFindNo) 
 {
@@ -104,7 +104,7 @@ No *Grafo::insereNo(int idNo, int peso)
             aux->setPesoNo(peso);
         }
 
-    return NULL;
+    return aux;
 }
 
 /*
@@ -132,40 +132,45 @@ bool Grafo::removeNo(int idNo)
             removeAresta(noAux, noParaRemover->getIdNo());
             noAux = noAux->getProxNo();
         }
-
+        
         Aresta *arestaParaRemover = noParaRemover->getPrimeiraAresta();
         No *noDestino = NULL;
-
-        while (arestaParaRemover != NULL) // removendo arestas de saida
+        
+        while (noParaRemover->getPrimeiraAresta() != NULL) // removendo arestas de saida
         {
-            noDestino = arestaParaRemover->getNoDestino();
+            noDestino = noParaRemover->getPrimeiraAresta()->getNoDestino();
             removeAresta(noParaRemover, noDestino->getIdNo());
         }
 
     } else // se nao e Digrafo
         {
-            Aresta *arestaParaRemover = noParaRemover->getPrimeiraAresta();
             No *noDestino = NULL;
 
-            while (arestaParaRemover != NULL) // removendo arestas do no
+            while (noParaRemover->getPrimeiraAresta() != NULL) // removendo arestas do No
             {
-                noDestino = arestaParaRemover->getNoDestino();
+                noDestino = noParaRemover->getPrimeiraAresta()->getNoDestino();
                 removeAresta(noParaRemover, noDestino->getIdNo());
                 removeAresta(noDestino, noParaRemover->getIdNo());
             }
         }
-
+    
     // Remove o no
     
-    No *noAux = noRaiz;
-    while (noAux->getProxNo() != noParaRemover)
+    if (noParaRemover == noRaiz)
     {
-        noAux = noAux->getProxNo();
-    }
+        noRaiz = noParaRemover->getProxNo();
+    } else
+        {
+            No *noAux = noRaiz;
+            while (noAux->getProxNo() != noParaRemover)
+            {
+                noAux = noAux->getProxNo();
+            }
 
-    noAux->setProxNo(noParaRemover->getProxNo());
+            noAux->setProxNo(noParaRemover->getProxNo());
+        }
     delete noParaRemover;
-    this->decOrdem();
+    decOrdem();
 
     return true;
 }
@@ -208,7 +213,24 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
         if (novaAresta == NULL) // se aresta nao existe
         {
             novaAresta = new Aresta(noDestino, NULL, pesoAresta);
-            noFonte->setPrimeiraAresta(novaAresta);
+
+            // ajusta arestas
+            if (noFonte->getPrimeiraAresta() == NULL)
+            {
+                noFonte->setPrimeiraAresta(novaAresta);
+            } else
+                {
+                    Aresta *aux = noFonte->getPrimeiraAresta();
+                    while (aux->getProxAresta() != NULL)
+                    {
+                        aux = aux->getProxAresta();
+                    }
+                    aux->setProxAresta(novaAresta);
+                }
+
+            // inc graus
+            noFonte->incGrauSaida();
+            noDestino->incGrauEntrada();
         } else // se existe
             {
                 novaAresta->setPeso(pesoAresta);
@@ -218,23 +240,40 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             if (novaAresta == NULL) // se aresta nao existe
             {
                 novaAresta = new Aresta(noDestino, NULL, pesoAresta);
-                noFonte->setPrimeiraAresta(novaAresta);
-                
-                Aresta *novaAresta2 = noDestino->getPrimeiraAresta(); // aresta sentido contrario
 
-                while (novaAresta2 != NULL && novaAresta2->getNoDestino()->getIdNo() != noFonte->getIdNo()) // procura aresta correspondente se ela existe
+                // ajusta arestas
+                if (noFonte->getPrimeiraAresta() == NULL)
                 {
-                    novaAresta2 = novaAresta2->getProxAresta();
-                }
-
-                if (novaAresta2 == NULL) // se aresta destino -> fonte nao existe
-                {
-                    novaAresta2 = new Aresta(noFonte, NULL, pesoAresta);
-                    noDestino->setPrimeiraAresta(novaAresta2);
-                } else // se existe
+                    noFonte->setPrimeiraAresta(novaAresta);
+                } else
                     {
-                        novaAresta2->setPeso(pesoAresta);
+                        Aresta *aux = noFonte->getPrimeiraAresta();
+                        while (aux->getProxAresta() != NULL)
+                        {
+                            aux = aux->getProxAresta();
+                        }
+                        aux->setProxAresta(novaAresta);
                     }
+                
+                Aresta *novaAresta2 = new Aresta(noFonte, NULL, pesoAresta); // aresta sentido contrario 
+
+                // ajusta arestas
+                if (noDestino->getPrimeiraAresta() == NULL)
+                {
+                    noDestino->setPrimeiraAresta(novaAresta2);
+                } else
+                    {
+                        Aresta *aux = noDestino->getPrimeiraAresta();
+                        while (aux->getProxAresta() != NULL)
+                        {
+                            aux = aux->getProxAresta();
+                        }
+                        aux->setProxAresta(novaAresta2);
+                    }
+
+                // inc graus
+                noFonte->incGrau();
+                noDestino->incGrau();
             } else // se existe
                 {
                     novaAresta->setPeso(pesoAresta);
@@ -247,19 +286,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                     auxAresta->setPeso(pesoAresta);
                 }
         }
-
-    // incrementa Graus
-
-    if (isDigrafo())
-    {
-        noFonte->incGrauSaida();
-        noDestino->incGrauEntrada();
-    } else
-        {
-            noFonte->incGrau();
-            noDestino->incGrau();
-        }
-
+        
     return true;
 }
 
@@ -310,19 +337,30 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
 
 /*
     GetNumAresta
-    Retorna o numero de aresta do grafo.
+    Retorna o numero de aresta do grafo(ou arcos do digrafo).
 */
 int Grafo::getNumAresta() 
 {
     No *noAux = noRaiz;
-    numAresta = 0;
+    int numArest = 0;
 
-    while (noAux != NULL) 
+    if (isDigrafo())
     {
-        numAresta += noAux->getGrau();
-        noAux = noAux->getProxNo();
-    }
-    return numAresta / 2;
+        while (noAux != NULL)
+        {
+            numArest = numArest + noAux->getGrauEntrada();
+            noAux = noAux->getProxNo();
+        }
+        return numArest;
+    } else
+        {
+            while (noAux != NULL) 
+            {
+                numArest = numArest + noAux->getGrau();
+                noAux = noAux->getProxNo();
+            }
+            return numArest / 2;
+        }
 }
 
 /*
@@ -341,13 +379,16 @@ int Grafo::getOrdem()
     return this->ordem;
 }
 
+/*
+    Retorna grau maximo de um grafo simples
+*/
 int Grafo::getGrau()
 {
     return getGrauEntrada();
 }
 
 /*
-    Retorna grau de entrada.
+    Retorna grau max de entrada.
 */
 int Grafo::getGrauEntrada() 
 {
@@ -366,7 +407,7 @@ int Grafo::getGrauEntrada()
 }
 
 /*
-    Retorna grau de saida.
+    Retorna grau max de saida.
 */
 int Grafo::getGrauSaida() 
 {
