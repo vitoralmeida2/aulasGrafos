@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string>
 #include <sstream>
-#include <vector>
+#include <list>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
@@ -11,13 +11,16 @@ using namespace std;
 
 // --- Construtor ---
 
-Grafo::Grafo(bool isDigrafo, bool pesoNO, bool pesoArc) 
+Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc) 
 {
     this->ordem = 0;
     this->noRaiz = NULL;
     this->digrafo = isDigrafo;
     this->pesoNo = pesoNO;
     this->pesoArco = pesoArc;
+    this->numNos = numVertices;
+    visitado = new int[numVertices+1];
+    adjList = new list<No*>[numVertices+1];
 }
 
 // --- Destrutor ---
@@ -32,6 +35,9 @@ Grafo::~Grafo()
         delete noAux;
         noAux = noAuxProx;
     }
+
+    delete visitado;
+    delete adjList;
 }
 
 // --- SET ---
@@ -79,11 +85,13 @@ No *Grafo::procurarNoPeloId(int idFindNo)
 
 /*  insereNo -
     A funcao insere o No caso ele nao existe ou atualiza seu peso.
+    retorna o No criado ou alterado
 */
 No *Grafo::insereNo(int idNo, int peso) 
 {
     No *aux = procurarNoPeloId(idNo);
 
+    // se No nao existe
     if (aux == NULL)
     {
         No *novoNo = new No(idNo, peso);
@@ -99,7 +107,7 @@ No *Grafo::insereNo(int idNo, int peso)
         
         incOrdem();
         return novoNo;
-    } else
+    } else // se No existe
         {
             aux->setPesoNo(peso);
         }
@@ -154,7 +162,7 @@ bool Grafo::removeNo(int idNo)
             }
         }
     
-    // Remove o no
+    // Ajusta Nos
     
     if (noParaRemover == noRaiz)
     {
@@ -169,6 +177,8 @@ bool Grafo::removeNo(int idNo)
 
             noAux->setProxNo(noParaRemover->getProxNo());
         }
+    
+    // deleta No
     delete noParaRemover;
     decOrdem();
 
@@ -213,6 +223,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
         if (novaAresta == NULL) // se aresta nao existe
         {
             novaAresta = new Aresta(noDestino, NULL, pesoAresta);
+            adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
 
             // ajusta arestas
             if (noFonte->getPrimeiraAresta() == NULL)
@@ -240,6 +251,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             if (novaAresta == NULL) // se aresta nao existe
             {
                 novaAresta = new Aresta(noDestino, NULL, pesoAresta);
+                adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -256,6 +268,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                     }
                 
                 Aresta *novaAresta2 = new Aresta(noFonte, NULL, pesoAresta); // aresta sentido contrario 
+                adjList[idNoDestino].push_back(noFonte); // adicionando adjacencia na lista
 
                 // ajusta arestas
                 if (noDestino->getPrimeiraAresta() == NULL)
@@ -274,7 +287,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 // inc graus
                 noFonte->incGrau();
                 noDestino->incGrau();
-            } else // se existe
+            } else // se aresta existe
                 {
                     novaAresta->setPeso(pesoAresta);
 
@@ -298,7 +311,7 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
     Aresta *arestaParaRemover = noFonte->getPrimeiraAresta();
     Aresta *arestaAnterior = NULL;
 
-    while (arestaParaRemover != NULL) // procurando aresta
+    while (arestaParaRemover != NULL) // procurando aresta para remover
     {
         if (arestaParaRemover->getNoDestino()->getIdNo() == idNoDestino) // aresta encontrada
         {
@@ -342,7 +355,7 @@ bool Grafo::removeAresta(No *noFonte, int idNoDestino)
 int Grafo::getNumAresta() 
 {
     No *noAux = noRaiz;
-    int numArest = 0;
+    numArest = 0;
 
     if (isDigrafo())
     {
@@ -432,4 +445,98 @@ int Grafo::getGrauSaida()
 bool Grafo::isDigrafo() 
 {
     return this->digrafo;
+}
+
+// --- Funcoes Grafo ---
+
+/*
+    imprime o grafo representado em lista de adjacencia
+*/
+void Grafo::imprimeGrafo()
+{
+    cout << "Lista de Adjacencia: " << endl;
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        cout << i << " -> ";
+        for (No *adj:adjList[i])
+        {
+            cout << adj->getIdNo() << " -> ";
+        }
+        cout << "//" << endl;
+    }
+}
+
+/*
+    Funcao que inicializa busca em profundidade
+*/
+void Grafo::buscaProfundidade(int idNoInicial)
+{
+    // inicializa todas posicoes do vetor como false
+   for (int i = 0; i <= this->numNos; i++)
+   {
+        visitado[i] = false;
+   }
+
+    // visita Nos a partir do idNoInicial
+   for (int i = 1; i <= this->numNos; i++)
+   {
+        if (visitado[i] == false)
+        {
+            buscaProfundidadeVisita(idNoInicial);
+        }
+   }
+}
+
+/*
+    Visita nos em profundidade
+*/
+void Grafo::buscaProfundidadeVisita(int idNoInicial)
+{
+    visitado[idNoInicial] = true;
+    cout << idNoInicial << endl;
+
+    for (No *adj:adjList[idNoInicial])
+    {
+        if (visitado[adj->getIdNo()] == false)
+        {
+            buscaProfundidadeVisita(adj->getIdNo());
+        }
+    }
+}
+
+/*
+    Funcao para identificar quantas componentes conexas ha no grafo
+*/
+void Grafo::componentesConexas()
+{
+    for (int i = 0; i <= this->numNos; i++)
+    {
+        visitado[i] = 0;
+    }
+
+    int componente = 0;
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (visitado[i] == 0)
+        {
+            componente = componente + 1;
+            componentesConexasVisita(i, componente);
+        }
+    }
+}
+
+/*
+    Visita nos para identificar componentes conexas
+*/
+void Grafo::componentesConexasVisita(int v, int marca)
+{
+    visitado[v] = marca;
+
+    for (No *adj:adjList[v])
+    {
+        if (visitado[adj->getIdNo()] == 0)
+        {
+            componentesConexasVisita(adj->getIdNo(), marca);
+        }
+    }
 }

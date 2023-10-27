@@ -3,8 +3,10 @@
 #include <iostream>
 #include <stdlib.h>
 #include <sstream>
+#include <list>
 #include "No.h"
 #include "Aresta.h"
+
 
 using namespace std;
 
@@ -17,7 +19,7 @@ class Grafo
 {
     public:
         // --- Construtor e Destrutor ---
-        Grafo(bool isDigrafo, bool pesoNo, bool pesoArco);
+        Grafo(int numVertices, bool isDigrafo, bool pesoNo, bool pesoArco);
         ~Grafo();
 
         // --- SET ---
@@ -41,14 +43,24 @@ class Grafo
         int getGrauEntrada();
         int getGrauSaida();
         bool isDigrafo();
+
+        // --- Funcoes Grafo ---
+        void imprimeGrafo(); // imprime grafo lista de adjacencia
+        void buscaProfundidade(int idNoInicial);
+        void buscaProfundidadeVisita(int idNoInicial);
+        void componentesConexas();
+        void componentesConexasVisita(int v, int marca);
     
     private:
         int ordem;
-        int numAresta;
+        int numNos;
+        int numArest;
         bool digrafo;
         bool pesoNo;
         bool pesoArco;
+        int *visitado;
         No *noRaiz;
+        list<No*> *adjList;
 
 };
 

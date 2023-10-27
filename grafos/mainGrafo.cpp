@@ -3,23 +3,19 @@
 
 using namespace std;
 
-int main()
+int main(int argc, const char* argv[])
 {
-    Grafo *g = new Grafo(false, false, false);
-    g->insereAresta(1, 2, 0);
-    g->insereAresta(1, 3, 0);
-    g->insereAresta(2, 3, 0);
-    g->insereAresta(4, 2, 0);
-    cout << "Raiz: " << g->getNoRaiz()->getIdNo() << endl;
-    cout << g->getOrdem() << endl;
-    cout << g->getNumAresta() << endl;
-    cout << g->getGrau() << endl;
-    g->removeNo(4);
-    cout << g->getOrdem() << endl;
-    cout << g->getNumAresta() << endl;
-    cout << g->getGrau() << endl;
+    Grafo g(5, false, false, false);
+    
+    g.insereAresta(1, 2, 0);
+    g.insereAresta(3, 5, 0);
+    g.insereAresta(2, 3, 0);
+    g.insereAresta(4, 3, 0);
+    g.insereAresta(1, 3, 0);
+    g.insereAresta(5, 4, 0);
 
-    delete g;
+    g.buscaProfundidade(1);
+
 
     system("pause");
     return 0;
