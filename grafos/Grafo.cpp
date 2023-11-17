@@ -22,11 +22,6 @@ Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc)
     this->pesoArco = pesoArc;
     this->numNos = numVertices;
     adjList = new NodeList[numVertices+1];
-    pesosArestas = new int*[numVertices+1];
-    for (int i = 0; i <= numVertices+1; i++)
-    {
-        pesosArestas[i] = new int[numVertices+1];
-    }
 }
 
 // --- Destrutor ---
@@ -42,12 +37,6 @@ Grafo::~Grafo()
         noAux = noAuxProx;
     }
 
-    for (int i = 0; i <= this->numNos+1; i++)
-    {
-        delete [] pesosArestas[i];
-    }
-
-    delete pesosArestas;
     delete adjList;
 }
 

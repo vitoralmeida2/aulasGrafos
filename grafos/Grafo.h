@@ -76,7 +76,6 @@ class Grafo
         bool pesoArco;
         No *noRaiz;
         NodeList *adjList;
-        int **pesosArestas;
 };
 
 #endif // GRAFO_H

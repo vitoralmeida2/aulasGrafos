@@ -11,10 +11,6 @@ int main(int argc, const char* argv[])
     g.insereAresta(5, 2, 1);
     g.insereAresta(2, 4, 4);
     g.insereAresta(4, 3, 3);
-    
-    cout << g.Floyd(1, 3) << endl;
-    
-   
 
     system("pause");
     return 0;
