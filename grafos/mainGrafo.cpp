@@ -5,17 +5,16 @@ using namespace std;
 
 int main(int argc, const char* argv[])
 {
-    Grafo g(5, false, false, false);
+    Grafo g(5, true, false, false);
     
-    g.insereAresta(1, 2, 0);
-    g.insereAresta(3, 5, 0);
-    g.insereAresta(2, 3, 0);
-    g.insereAresta(4, 3, 0);
-    g.insereAresta(1, 3, 0);
-    g.insereAresta(5, 4, 0);
-
-    g.buscaProfundidade(1);
-
+    g.insereAresta(1, 5, 2);
+    g.insereAresta(5, 2, 1);
+    g.insereAresta(2, 4, 4);
+    g.insereAresta(4, 3, 3);
+    
+    cout << g.Floyd(1, 3) << endl;
+    
+   
 
     system("pause");
     return 0;

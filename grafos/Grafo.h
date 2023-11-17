@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <sstream>
 #include <list>
+#include <vector>
+#include <stack>
 #include "No.h"
 #include "Aresta.h"
 
@@ -12,6 +14,8 @@ using namespace std;
 
 class No;
 class Aresta;
+
+typedef list<No*> NodeList;
 
 // --- Definindo class Grafo ---
 
@@ -33,7 +37,7 @@ class Grafo
 
         // --- Funcoes de Aresta ---
         bool insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta);
-        bool removeAresta(No *noFonte, int idNoDestino);
+        bool removeAresta(No *noFonte, No *noDestino);
 
         // --- Caracteristica do Grafo ---
         int getNumAresta();
@@ -45,11 +49,23 @@ class Grafo
         bool isDigrafo();
 
         // --- Funcoes Grafo ---
-        void imprimeGrafo(); // imprime grafo lista de adjacencia
+        void imprimeGrafo();
         void buscaProfundidade(int idNoInicial);
-        void buscaProfundidadeVisita(int idNoInicial);
-        void componentesConexas();
-        void componentesConexasVisita(int v, int marca);
+        void buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado);
+        bool isCiclo();
+        bool isCicloAux(int i, vector<bool> &visitado, vector<bool> &visiting);
+        bool isConexo();
+        int componentesConexas();
+        void componentesConexasVisita(int i, int marca, vector<int> &visitado);
+        void ordenacaoTopologica();
+        void ordenacaoTopologicaVisita(int i, vector<bool> &visitado, stack<int> &pilhaOrdenacao);
+        void fechoTransitivoDireto(int idNoInicial);
+        void fechoTransitivoIndireto();
+        void Djkstra();
+        int Floyd(int idOrigem, int idDestino);
+        int auxFloyd(int idOrigem, int idDestino);
+        void Prim();
+        void Kruskal();
     
     private:
         int ordem;
@@ -58,10 +74,9 @@ class Grafo
         bool digrafo;
         bool pesoNo;
         bool pesoArco;
-        int *visitado;
         No *noRaiz;
-        list<No*> *adjList;
-
+        NodeList *adjList;
+        int **pesosArestas;
 };
 
 #endif // GRAFO_H

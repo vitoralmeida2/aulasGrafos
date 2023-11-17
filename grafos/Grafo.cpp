@@ -3,6 +3,8 @@
 #include <string>
 #include <sstream>
 #include <list>
+#include <vector>
+#include <stack>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
@@ -19,8 +21,12 @@ Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc)
     this->pesoNo = pesoNO;
     this->pesoArco = pesoArc;
     this->numNos = numVertices;
-    visitado = new int[numVertices+1];
-    adjList = new list<No*>[numVertices+1];
+    adjList = new NodeList[numVertices+1];
+    pesosArestas = new int*[numVertices+1];
+    for (int i = 0; i <= numVertices+1; i++)
+    {
+        pesosArestas[i] = new int[numVertices+1];
+    }
 }
 
 // --- Destrutor ---
@@ -36,7 +42,12 @@ Grafo::~Grafo()
         noAux = noAuxProx;
     }
 
-    delete visitado;
+    for (int i = 0; i <= this->numNos+1; i++)
+    {
+        delete [] pesosArestas[i];
+    }
+
+    delete pesosArestas;
     delete adjList;
 }
 
@@ -137,7 +148,7 @@ bool Grafo::removeNo(int idNo)
         No *noAux = noRaiz;
         while (noParaRemover->getGrauEntrada() != 0 && noAux != NULL) // removendo arestas de entrada
         {
-            removeAresta(noAux, noParaRemover->getIdNo());
+            removeAresta(noAux, noParaRemover);
             noAux = noAux->getProxNo();
         }
         
@@ -147,7 +158,7 @@ bool Grafo::removeNo(int idNo)
         while (noParaRemover->getPrimeiraAresta() != NULL) // removendo arestas de saida
         {
             noDestino = noParaRemover->getPrimeiraAresta()->getNoDestino();
-            removeAresta(noParaRemover, noDestino->getIdNo());
+            removeAresta(noParaRemover, noDestino);
         }
 
     } else // se nao e Digrafo
@@ -157,8 +168,8 @@ bool Grafo::removeNo(int idNo)
             while (noParaRemover->getPrimeiraAresta() != NULL) // removendo arestas do No
             {
                 noDestino = noParaRemover->getPrimeiraAresta()->getNoDestino();
-                removeAresta(noParaRemover, noDestino->getIdNo());
-                removeAresta(noDestino, noParaRemover->getIdNo());
+                removeAresta(noParaRemover, noDestino);
+                removeAresta(noDestino, noParaRemover);
             }
         }
     
@@ -179,6 +190,26 @@ bool Grafo::removeNo(int idNo)
         }
     
     // deleta No
+
+    /*
+        remove No da lista de adjacencia
+    */
+    for (int i = 1; i <= this->numNos; i ++)
+    {
+        if (i == idNo)
+        {
+            adjList[i].clear();
+        }
+        
+        for (No *adj:adjList[i])
+        {
+            if (adj == noParaRemover)
+            {
+                adjList[i].remove(noParaRemover);
+            }
+        }
+    }
+    
     delete noParaRemover;
     decOrdem();
 
@@ -306,14 +337,14 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
 /*
     Remove arestas
 */
-bool Grafo::removeAresta(No *noFonte, int idNoDestino)
+bool Grafo::removeAresta(No *noFonte, No *noDestino)
 {   
     Aresta *arestaParaRemover = noFonte->getPrimeiraAresta();
     Aresta *arestaAnterior = NULL;
 
     while (arestaParaRemover != NULL) // procurando aresta para remover
     {
-        if (arestaParaRemover->getNoDestino()->getIdNo() == idNoDestino) // aresta encontrada
+        if (arestaParaRemover->getNoDestino()->getIdNo() == noDestino->getIdNo()) // aresta encontrada
         {
             // decrementa graus
             if (isDigrafo())
@@ -457,7 +488,7 @@ void Grafo::imprimeGrafo()
     cout << "Lista de Adjacencia: " << endl;
     for (int i = 1; i <= this->numNos; i++)
     {
-        cout << i << " -> ";
+        cout << "[" << i << "]" << " -> ";
         for (No *adj:adjList[i])
         {
             cout << adj->getIdNo() << " -> ";
@@ -467,76 +498,226 @@ void Grafo::imprimeGrafo()
 }
 
 /*
-    Funcao que inicializa busca em profundidade
+    Funcao que inicia busca em profundidade
 */
 void Grafo::buscaProfundidade(int idNoInicial)
 {
-    // inicializa todas posicoes do vetor como false
-   for (int i = 0; i <= this->numNos; i++)
-   {
-        visitado[i] = false;
-   }
-
-    // visita Nos a partir do idNoInicial
-   for (int i = 1; i <= this->numNos; i++)
-   {
-        if (visitado[i] == false)
-        {
-            buscaProfundidadeVisita(idNoInicial);
-        }
-   }
+    // inicia vetor de visitados com posicoes = false
+    vector<bool> visitado(this->numNos+1, false);
+    buscaProfundidadeVisita(idNoInicial, visitado);
 }
 
 /*
-    Visita nos em profundidade
+    Funcao para visitar em profundidade
 */
-void Grafo::buscaProfundidadeVisita(int idNoInicial)
+void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado)
 {
+    // Marca o No atual como visitado
     visitado[idNoInicial] = true;
-    cout << idNoInicial << endl;
+    // cout << idNoInicial << " ";
 
+    // Percorre todos os vertices adjacentes do vertice atual
     for (No *adj:adjList[idNoInicial])
     {
+        // visitado adjacente se nao visitado
         if (visitado[adj->getIdNo()] == false)
         {
-            buscaProfundidadeVisita(adj->getIdNo());
+            buscaProfundidadeVisita(adj->getIdNo(), visitado);
         }
     }
+}
+
+/*
+    Funcao para verificar se ha ciclo no grafo
+*/
+bool Grafo::isCiclo()
+{
+    // inicia vetor visitado e vetor visiting com posicoes = false
+    vector<bool> visitado(this->numNos+1, false);
+    vector<bool> visiting(this->numNos+1, false);
+
+    // chama funcao recursiva para verificar se ha ciclo
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (isCicloAux(i, visitado, visiting))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+/*
+    Funcao auxiliar para verificar se ha ciclo no grafo
+*/
+bool Grafo::isCicloAux(int i, vector<bool> &visitado, vector<bool> &visiting)
+{
+    if (visiting[i])
+    {
+        return true; // return true se No estiver sendo visitado
+    }
+
+    if (visitado[i])
+    {
+        return false; // return false se No ja foi visitado
+    }
+
+    // seta true para visiting e visitado
+    visitado[i] = true;
+    visiting[i] = true;
+
+    // verifica Nos adjacentes
+    for (No *adj:adjList[i])
+    {
+        if (isCicloAux(adj->getIdNo(), visitado, visiting))
+        {
+            return true;    // se possui ciclo return true
+        }
+    }
+
+    visiting[i] = false;
+
+    return false;
+}
+
+/*
+    Funcao para verificar se um grafo e conexo
+    return true se sim
+*/
+bool Grafo::isConexo()
+{
+    if (componentesConexas() == 1)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 /*
     Funcao para identificar quantas componentes conexas ha no grafo
 */
-void Grafo::componentesConexas()
+int Grafo::componentesConexas()
 {
-    for (int i = 0; i <= this->numNos; i++)
-    {
-        visitado[i] = 0;
-    }
+    // inicializa marca das componentes e vetor de visitados
+    vector<int> visitado(this->numNos+1, 0);
+    int componentes = 0;
 
-    int componente = 0;
     for (int i = 1; i <= this->numNos; i++)
     {
         if (visitado[i] == 0)
         {
-            componente = componente + 1;
-            componentesConexasVisita(i, componente);
+            componentes++;
+            componentesConexasVisita(i, componentes, visitado);
+        }
+    }
+
+    return componentes;
+}
+
+/*
+    Funcao auxiliar parar visitar componentes conexas
+*/
+void Grafo::componentesConexasVisita(int v, int marca, vector<int> &visitados)
+{
+    visitados[v] = marca;
+
+    for (No *adj:adjList[v])
+    {
+        if (visitados[adj->getIdNo()] == 0)
+        {
+            componentesConexasVisita(adj->getIdNo(), marca, visitados);
         }
     }
 }
 
 /*
-    Visita nos para identificar componentes conexas
+    Funcao que ordena topologicamente o grafo
 */
-void Grafo::componentesConexasVisita(int v, int marca)
+void Grafo::ordenacaoTopologica()
 {
-    visitado[v] = marca;
-
-    for (No *adj:adjList[v])
+    if (isCiclo())
     {
-        if (visitado[adj->getIdNo()] == 0)
+        cout << "O grafo contém um ciclo. Não é possível ordenar topologicamente." << endl;
+        return;
+    }
+
+    // inicia vetor visitados com posicoes = false e pilha de ordenacao
+    vector<bool> visitado(this->numNos+1, false);
+    stack<int> pilhaOdernacao;
+
+    // chama funcao recursiva para ordenar topologicamente
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (visitado[i] == false)
         {
-            componentesConexasVisita(adj->getIdNo(), marca);
+            ordenacaoTopologicaVisita(i, visitado, pilhaOdernacao);
         }
     }
+
+    cout << "Odernacao Topologica do Grafo: ";
+    while(!pilhaOdernacao.empty())
+    {
+        cout << pilhaOdernacao.top() << " ";
+        pilhaOdernacao.pop();
+    }
+    cout << endl;
+}
+
+/*
+    Funcao auxliar ordenacaoTopologica
+*/
+void Grafo::ordenacaoTopologicaVisita(int i, vector<bool> &visitado, stack<int> &pilhaOrdenacao)
+{
+    // marca No atual como visitado
+    visitado[i] = true;
+
+    // visita todos Nos adjacentes do No atual
+    for (No *adj:adjList[i])
+    {
+        if (visitado[adj->getIdNo()] == false)
+        {
+            ordenacaoTopologicaVisita(adj->getIdNo(), visitado, pilhaOrdenacao);
+        }
+    }
+
+    pilhaOrdenacao.push(i);
+}
+
+/*
+    Funcao para obter fecho transitivo direto
+*/
+void Grafo::fechoTransitivoDireto(int idNoInicial)
+{
+    if (isDigrafo())
+    {
+        // vetor fecho transitivo direto para No inicial
+        vector<bool> visitado(this->numNos+1, false);
+        buscaProfundidadeVisita(idNoInicial, visitado);
+
+        cout << "Fecho transitivo direto a partir do No " << idNoInicial << ": ";
+        for (int i = 1; i <= this->numNos; i++)
+        {
+            if (visitado[i] == true && i != idNoInicial)
+            {
+                cout << i << " ";
+            }
+        }
+
+    } else
+        {
+            cout << "Grafo nao e direcionado" << endl;
+        }
+}
+
+void Grafo::fechoTransitivoIndireto()
+{
+    if (isDigrafo())
+    {
+        // codigo
+    } else
+        {
+            cout << "Grafo nao e direcionado" << endl;
+        }
 }
