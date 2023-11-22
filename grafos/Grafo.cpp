@@ -5,9 +5,12 @@
 #include <list>
 #include <vector>
 #include <stack>
+#include <queue>
+#include <limits>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
+#define INFINITO 999999
 
 using namespace std;
 
@@ -22,6 +25,7 @@ Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc)
     this->pesoArco = pesoArc;
     this->numNos = numVertices;
     adjList = new NodeList[numVertices+1];
+    distanceList = new DistancesList[numVertices+1];
 }
 
 // --- Destrutor ---
@@ -37,7 +41,7 @@ Grafo::~Grafo()
         noAux = noAuxProx;
     }
 
-    delete adjList;
+    delete [] adjList;
 }
 
 // --- SET ---
@@ -244,6 +248,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
         {
             novaAresta = new Aresta(noDestino, NULL, pesoAresta);
             adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
+            distanceList[idNoOrigem].push_back({idNoDestino, pesoAresta});  // adicionando distancia na lista de distancias
 
             // ajusta arestas
             if (noFonte->getPrimeiraAresta() == NULL)
@@ -272,6 +277,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             {
                 novaAresta = new Aresta(noDestino, NULL, pesoAresta);
                 adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
+                distanceList[idNoOrigem].push_back({idNoDestino, pesoAresta}); // adicionando distancia na lista de distancias
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -289,6 +295,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 
                 Aresta *novaAresta2 = new Aresta(noFonte, NULL, pesoAresta); // aresta sentido contrario 
                 adjList[idNoDestino].push_back(noFonte); // adicionando adjacencia na lista
+                distanceList[idNoDestino].push_back({idNoOrigem, pesoAresta}); // adicionando distancia na lista de distancias
 
                 // ajusta arestas
                 if (noDestino->getPrimeiraAresta() == NULL)
@@ -709,4 +716,84 @@ void Grafo::fechoTransitivoIndireto()
         {
             cout << "Grafo nao e direcionado" << endl;
         }
+}
+
+vector<int> Grafo::Dijkstra(int idNoInicial)
+{
+    // inicial vetor de distancias e define distancia do No inicial para ele mesmo como 0
+    vector<int> distancesDijkstra(this->numNos+1, INFINITO);
+    distancesDijkstra[idNoInicial] = 0;
+
+    // fila de pares que representa a distancia e o no antecedente -> <distancia do No inicial até No X, No que antecede X>
+    queue<pair<int, int>> fila;
+    fila.push({0, idNoInicial});
+
+    // enquanto fila nao esta vazia
+    while (!fila.empty())
+    {
+        int distance = fila.front().first;
+        int vertex = fila.front().second;
+        fila.pop();
+
+        // se distancia em distantecDijkstra ja e a menor, continue
+        if (distance > distancesDijkstra[vertex])
+            continue;
+        // se nao:
+        // para cada vizinho do vertice atual, calcula nova distancia
+        for (pair<int,int> vizinhos:distanceList[vertex])
+        {
+            int newDistance = distance + vizinhos.second;
+            if (newDistance < distancesDijkstra[vizinhos.first]) // se nova distancia for menor, atualiza vector Dijkstra e adiciona vizinho na fila
+            {
+                distancesDijkstra[vizinhos.first] = newDistance;
+                fila.push({newDistance, vizinhos.first});
+            }
+        }
+    }
+
+    return distancesDijkstra; // retorna vector de distancias 
+}
+
+int Grafo::Floyd(int idNoOrigem, int idNoDestino)
+{
+    // inicia matriz com todos valores = INFINITO
+    vector<vector<int>> distancesFloyd(this->numNos+1, vector<int>(this->numNos+1, INFINITO));
+
+    // seta diagonal = 0 e insere distancias
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        for (int j = 1; j <= this->numNos; j++)
+        {
+            if (i == j)
+            {
+                distancesFloyd[i][j] = 0;
+                continue;
+            }
+
+            for (pair<int, int> NoAdj:distanceList[i])
+            {
+                if (NoAdj.first == j)
+                {
+                    distancesFloyd[i][j] = NoAdj.second;
+                    break;
+                }
+            }
+        }
+    }
+
+    for (int k = 1; k <= this->numNos; k++)
+    {
+        for (int i = 1; i <= this->numNos; i++)
+        {
+            for (int j = 1; j <= this->numNos; j++)
+            {
+                if (distancesFloyd[i][j] > distancesFloyd[i][k] + distancesFloyd[k][j])
+                {
+                    distancesFloyd[i][j] = distancesFloyd[i][k] + distancesFloyd[k][j];
+                }
+            }
+        }
+    }
+
+    return distancesFloyd[idNoOrigem][idNoDestino];
 }

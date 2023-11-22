@@ -6,16 +6,18 @@
 #include <list>
 #include <vector>
 #include <stack>
+#include <queue>
+#include <limits>
 #include "No.h"
 #include "Aresta.h"
-
 
 using namespace std;
 
 class No;
 class Aresta;
 
-typedef list<No*> NodeList;
+typedef list<No*> NodeList; // lista de adjancencia
+typedef list<pair<int, int>> DistancesList; // lista de distancia entre os vizinhos <id vizinho, distancia para aquele vizinho>
 
 // --- Definindo class Grafo ---
 
@@ -61,9 +63,8 @@ class Grafo
         void ordenacaoTopologicaVisita(int i, vector<bool> &visitado, stack<int> &pilhaOrdenacao);
         void fechoTransitivoDireto(int idNoInicial);
         void fechoTransitivoIndireto();
-        void Djkstra();
+        vector<int> Dijkstra(int idNoInicial);
         int Floyd(int idOrigem, int idDestino);
-        int auxFloyd(int idOrigem, int idDestino);
         void Prim();
         void Kruskal();
     
@@ -76,6 +77,7 @@ class Grafo
         bool pesoArco;
         No *noRaiz;
         NodeList *adjList;
+        DistancesList *distanceList;
 };
 
 #endif // GRAFO_H
