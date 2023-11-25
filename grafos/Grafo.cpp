@@ -858,8 +858,3 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
 
     return distancesFloyd[idNoOrigem][idNoDestino];
 }
-
-void Kruskal()
-{
-     
-}
