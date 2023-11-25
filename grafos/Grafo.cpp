@@ -19,11 +19,13 @@ using namespace std;
 Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc) 
 {
     this->ordem = 0;
-    this->noRaiz = NULL;
+    this->numNos = numVertices;
+    this->numArest = 0;
     this->digrafo = isDigrafo;
     this->pesoNo = pesoNO;
     this->pesoArco = pesoArc;
-    this->numNos = numVertices;
+    this->noRaiz = NULL;
+    this->arestaMenorPeso = NULL;
     adjList = new NodeList[numVertices+1];
     distanceMat = new int*[numVertices+1];
     for (int i = 0; i <= this->numNos; i++)
@@ -286,6 +288,18 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                     }
                     aux->setProxAresta(novaAresta);
                 }
+            
+            // verifica se e Aresta de menor peso
+            if (this->arestaMenorPeso == NULL)
+            {
+                this->arestaMenorPeso = novaAresta;
+            } else
+                {
+                    if (this->arestaMenorPeso->getPesoAresta() > pesoAresta)
+                    {
+                        this->arestaMenorPeso = novaAresta;
+                    }
+                }
 
             // inc graus
             noFonte->incGrauSaida();
@@ -294,6 +308,12 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             {
                 novaAresta->setPeso(pesoAresta);
                 distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // atualizando distancia na matriz de distancias
+
+                // verifica se e Aresta de menor peso
+                if (this->arestaMenorPeso->getPesoAresta() > pesoAresta)
+                {
+                    this->arestaMenorPeso = novaAresta;
+                }
             }
     } else // se nao e Digrafo
         {
@@ -315,6 +335,18 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                             aux = aux->getProxAresta();
                         }
                         aux->setProxAresta(novaAresta);
+                    }
+                
+                // verifica se e Aresta de menor peso
+                if (this->arestaMenorPeso == NULL)
+                {
+                    this->arestaMenorPeso = novaAresta;
+                } else
+                    {
+                        if (this->arestaMenorPeso->getPesoAresta() > pesoAresta)
+                        {
+                            this->arestaMenorPeso = novaAresta;
+                        }
                     }
                 
                 // cria Aresta sentido contrario
@@ -344,6 +376,12 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                     // atualizando peso aresta
                     novaAresta->setPeso(pesoAresta);
                     distanceMat[idNoOrigem][idNoDestino] = pesoAresta;
+
+                    // verifica se e Aresta de menor peso
+                    if (this->arestaMenorPeso->getPesoAresta() > pesoAresta)
+                    {
+                        this->arestaMenorPeso = novaAresta;
+                    }
 
                     // atualizando peso aresta contraria
                     Aresta *auxAresta = noDestino->getPrimeiraAresta();
@@ -816,6 +854,12 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
             }
         }
     }
+    cout << "Aresta de menor peso: " << "(" << this->arestaMenorPeso->getIdNoOrigem() << ", " << this->arestaMenorPeso->getIdNoDestino() << ")" << endl;
 
     return distancesFloyd[idNoOrigem][idNoDestino];
+}
+
+void Kruskal()
+{
+     
 }
