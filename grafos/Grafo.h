@@ -8,6 +8,7 @@
 #include <stack>
 #include <queue>
 #include <limits>
+#include <algorithm>
 #include "No.h"
 #include "Aresta.h"
 
@@ -64,7 +65,7 @@ class Grafo
         void fechoTransitivoIndireto();
         vector<int> Dijkstra(int idNoInicial);
         int Floyd(int idOrigem, int idDestino);
-        vector<pair<int,int>> Prim();
+        void Prim();
         void Kruskal();
     
     private:
@@ -76,6 +77,7 @@ class Grafo
         bool pesoArco;
         No *noRaiz;
         Aresta *arestaMenorPeso;
+        vector<Aresta> arestList;
         NodeList *adjList;
         int **distanceMat;
 };

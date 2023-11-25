@@ -7,6 +7,7 @@
 #include <stack>
 #include <queue>
 #include <limits>
+#include <algorithm>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
@@ -274,6 +275,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
             adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
             distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
+            arestList.push_back(*novaAresta);
             
             // ajusta arestas do no origem
             if (noFonte->getPrimeiraAresta() == NULL)
@@ -322,6 +324,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
                 adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
                 distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
+                arestList.push_back(*novaAresta);
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -785,6 +788,9 @@ void Grafo::fechoTransitivoIndireto()
         }
 }
 
+/*
+    Algoritimo de Dijkstra usado para retorna as distancias entre o idNoInicial e todos os outros vertices
+*/
 vector<int> Grafo::Dijkstra(int idNoInicial)
 {
     // inicial vetor de distancias e define distancia do No inicial para ele mesmo como 0
@@ -821,6 +827,9 @@ vector<int> Grafo::Dijkstra(int idNoInicial)
     return distancesDijkstra; // retorna vector de distancias 
 }
 
+/*
+    Algoritmo de Floyd para retornar o caminho minimo entre dois Vertices
+*/
 int Grafo::Floyd(int idNoOrigem, int idNoDestino)
 {
     // inicia matriz com todos valores = INFINITO
