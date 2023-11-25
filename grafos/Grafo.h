@@ -17,7 +17,6 @@ class No;
 class Aresta;
 
 typedef list<No*> NodeList; // lista de adjancencia
-typedef list<pair<int, int>> DistancesList; // lista de distancia entre os vizinhos <id vizinho, distancia para aquele vizinho>
 
 // --- Definindo class Grafo ---
 
@@ -65,7 +64,7 @@ class Grafo
         void fechoTransitivoIndireto();
         vector<int> Dijkstra(int idNoInicial);
         int Floyd(int idOrigem, int idDestino);
-        void Prim();
+        vector<pair<int,int>> Prim();
         void Kruskal();
     
     private:
@@ -76,8 +75,9 @@ class Grafo
         bool pesoNo;
         bool pesoArco;
         No *noRaiz;
+        Aresta *arestaMenorPeso;
         NodeList *adjList;
-        DistancesList *distanceList;
+        int **distanceMat;
 };
 
 #endif // GRAFO_H

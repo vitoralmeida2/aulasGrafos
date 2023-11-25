@@ -10,7 +10,7 @@
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
-#define INFINITO 999999
+#define INFINITO INT16_MAX
 
 using namespace std;
 
@@ -25,7 +25,25 @@ Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc)
     this->pesoArco = pesoArc;
     this->numNos = numVertices;
     adjList = new NodeList[numVertices+1];
-    distanceList = new DistancesList[numVertices+1];
+    distanceMat = new int*[numVertices+1];
+    for (int i = 0; i <= this->numNos; i++)
+    {
+        distanceMat[i] = new int[numVertices+1];
+    }
+
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        for (int j = 1; j <= this->numNos; j++)
+        {
+            if (i == j)
+            {
+                distanceMat[i][j] = 0;
+            } else
+                {
+                    distanceMat[i][j] = INFINITO;
+                }
+        }
+    }
 }
 
 // --- Destrutor ---
@@ -41,6 +59,11 @@ Grafo::~Grafo()
         noAux = noAuxProx;
     }
 
+    for (int i = 0; i <= this->numNos; i++)
+    {
+        delete [] distanceMat[i];
+    }
+    
     delete [] adjList;
 }
 
@@ -246,11 +269,11 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
     {
         if (novaAresta == NULL) // se aresta nao existe
         {
-            novaAresta = new Aresta(noDestino, NULL, pesoAresta);
+            novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
             adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
-            distanceList[idNoOrigem].push_back({idNoDestino, pesoAresta});  // adicionando distancia na lista de distancias
-
-            // ajusta arestas
+            distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
+            
+            // ajusta arestas do no origem
             if (noFonte->getPrimeiraAresta() == NULL)
             {
                 noFonte->setPrimeiraAresta(novaAresta);
@@ -270,14 +293,15 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
         } else // se existe
             {
                 novaAresta->setPeso(pesoAresta);
+                distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // atualizando distancia na matriz de distancias
             }
     } else // se nao e Digrafo
         {
             if (novaAresta == NULL) // se aresta nao existe
             {
-                novaAresta = new Aresta(noDestino, NULL, pesoAresta);
+                novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
                 adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
-                distanceList[idNoOrigem].push_back({idNoDestino, pesoAresta}); // adicionando distancia na lista de distancias
+                distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -293,11 +317,12 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                         aux->setProxAresta(novaAresta);
                     }
                 
-                Aresta *novaAresta2 = new Aresta(noFonte, NULL, pesoAresta); // aresta sentido contrario 
+                // cria Aresta sentido contrario
+                Aresta *novaAresta2 = new Aresta(noDestino, noFonte, pesoAresta, NULL); 
                 adjList[idNoDestino].push_back(noFonte); // adicionando adjacencia na lista
-                distanceList[idNoDestino].push_back({idNoOrigem, pesoAresta}); // adicionando distancia na lista de distancias
+                distanceMat[idNoDestino][idNoOrigem] = pesoAresta; // adicionando distancia na matriz de distancias
 
-                // ajusta arestas
+                // ajusta arestas sentido contrario
                 if (noDestino->getPrimeiraAresta() == NULL)
                 {
                     noDestino->setPrimeiraAresta(novaAresta2);
@@ -316,10 +341,13 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 noDestino->incGrau();
             } else // se aresta existe
                 {
+                    // atualizando peso aresta
                     novaAresta->setPeso(pesoAresta);
+                    distanceMat[idNoOrigem][idNoDestino] = pesoAresta;
 
+                    // atualizando peso aresta contraria
                     Aresta *auxAresta = noDestino->getPrimeiraAresta();
-                    while (auxAresta->getNoDestino()->getIdNo() != noFonte->getIdNo())
+                    while (auxAresta->getIdNoDestino() != noFonte->getIdNo())
                     {
                         auxAresta = auxAresta->getProxAresta();
                     }
@@ -340,7 +368,7 @@ bool Grafo::removeAresta(No *noFonte, No *noDestino)
 
     while (arestaParaRemover != NULL) // procurando aresta para remover
     {
-        if (arestaParaRemover->getNoDestino()->getIdNo() == noDestino->getIdNo()) // aresta encontrada
+        if (arestaParaRemover->getIdNoDestino() == noDestino->getIdNo()) // aresta encontrada
         {
             // decrementa graus
             if (isDigrafo())
@@ -363,6 +391,7 @@ bool Grafo::removeAresta(No *noFonte, No *noDestino)
 
             // deleta aresta
             delete arestaParaRemover;
+            distanceMat[noFonte->getIdNo()][noDestino->getIdNo()] = INFINITO; // define distancia = INFINITO na matriz de distancias
             return true;
         }
 
@@ -724,7 +753,7 @@ vector<int> Grafo::Dijkstra(int idNoInicial)
     vector<int> distancesDijkstra(this->numNos+1, INFINITO);
     distancesDijkstra[idNoInicial] = 0;
 
-    // fila de pares que representa a distancia e o no antecedente -> <distancia do No inicial até No X, No que antecede X>
+    // fila de pares que representa a distancia e o no antecedente <distancia do No inicial até No X, No que antecede X>
     queue<pair<int, int>> fila;
     fila.push({0, idNoInicial});
 
@@ -740,13 +769,13 @@ vector<int> Grafo::Dijkstra(int idNoInicial)
             continue;
         // se nao:
         // para cada vizinho do vertice atual, calcula nova distancia
-        for (pair<int,int> vizinhos:distanceList[vertex])
+        for(int i = 1; i <= this->numNos; i++)
         {
-            int newDistance = distance + vizinhos.second;
-            if (newDistance < distancesDijkstra[vizinhos.first]) // se nova distancia for menor, atualiza vector Dijkstra e adiciona vizinho na fila
+            int newDistance = distance + this->distanceMat[vertex][i];
+            if (newDistance < distancesDijkstra[i])
             {
-                distancesDijkstra[vizinhos.first] = newDistance;
-                fila.push({newDistance, vizinhos.first});
+                distancesDijkstra[i] = newDistance;
+                fila.push({newDistance, i});
             }
         }
     }
@@ -770,14 +799,7 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
                 continue;
             }
 
-            for (pair<int, int> NoAdj:distanceList[i])
-            {
-                if (NoAdj.first == j)
-                {
-                    distancesFloyd[i][j] = NoAdj.second;
-                    break;
-                }
-            }
+            distancesFloyd[i][j] = this->distanceMat[i][j];
         }
     }
 
