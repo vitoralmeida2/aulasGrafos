@@ -20,6 +20,7 @@ int main(int argc, const char* argv[])
     g.insereAresta(6, 3, 3);
 
     g.Prim(1);
+    g.Kruskal();
     /*
     
     dijkstra = g.Dijkstra(5);

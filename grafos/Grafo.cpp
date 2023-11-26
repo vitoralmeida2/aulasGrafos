@@ -276,6 +276,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
             adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
             distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
+            arestList.push_back(*novaAresta); // lista de Arestas - Kruskal
             
             // ajusta arestas do no origem
             if (noFonte->getPrimeiraAresta() == NULL)
@@ -324,6 +325,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
                 adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
                 distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
+                arestList.push_back(*novaAresta); // lista de Arestas - Kruskal
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -355,6 +357,7 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 Aresta *novaAresta2 = new Aresta(noDestino, noFonte, pesoAresta, NULL); 
                 adjList[idNoDestino].push_back(noFonte); // adicionando adjacencia na lista
                 distanceMat[idNoDestino][idNoOrigem] = pesoAresta; // adicionando distancia na matriz de distancias
+                arestList.push_back(*novaAresta2); // lista de Arestas - Kruskal
 
                 // ajusta arestas sentido contrario
                 if (noDestino->getPrimeiraAresta() == NULL)
@@ -560,16 +563,26 @@ void Grafo::imprimeGrafo()
         }
         cout << "//" << endl;
     }
+
+    return;
 }
 
 /*
     Funcao que inicia busca em profundidade
 */
-void Grafo::buscaProfundidade(int idNoInicial)
+void Grafo::buscaProfundidade()
 {
     // inicia vetor de visitados com posicoes = false
     vector<bool> visitado(this->numNos+1, false);
-    buscaProfundidadeVisita(idNoInicial, visitado);
+
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (!visitado[i])
+        {
+            buscaProfundidadeVisita(i, visitado);
+        }
+    }
+    cout << endl;
 }
 
 /*
@@ -578,8 +591,8 @@ void Grafo::buscaProfundidade(int idNoInicial)
 void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado)
 {
     // Marca o No atual como visitado
+    cout << idNoInicial << " ";
     visitado[idNoInicial] = true;
-    // cout << idNoInicial << " ";
 
     // Percorre todos os vertices adjacentes do vertice atual
     for (No *adj:adjList[idNoInicial])
@@ -728,6 +741,8 @@ void Grafo::ordenacaoTopologica()
         pilhaOdernacao.pop();
     }
     cout << endl;
+
+    return;
 }
 
 /*
@@ -748,6 +763,8 @@ void Grafo::ordenacaoTopologicaVisita(int i, vector<bool> &visitado, stack<int> 
     }
 
     pilhaOrdenacao.push(i);
+
+    return;
 }
 
 /*
@@ -774,6 +791,8 @@ void Grafo::fechoTransitivoDireto(int idNoInicial)
         {
             cout << "Grafo nao e direcionado" << endl;
         }
+
+    return;
 }
 
 void Grafo::fechoTransitivoIndireto()
@@ -785,6 +804,8 @@ void Grafo::fechoTransitivoIndireto()
         {
             cout << "Grafo nao e direcionado" << endl;
         }
+
+    return;
 }
 
 /*
@@ -873,6 +894,7 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
 */
 void Grafo::Prim(int idNoInicial)
 {
+    int pesoAGM = 0;
     vector<Aresta> AGM; // conjunto de Arestas que representa a arvore
     vector<bool> visited(this->numNos+1, false); // vetor visitados
     priority_queue<Aresta> pq; // min Heap para ordenar arestas com base em seu peso
@@ -916,9 +938,74 @@ void Grafo::Prim(int idNoInicial)
     }
 
     // Imprimindo AGM
-    cout << "Arvore geradora minima: ";
-    for (Aresta prim:AGM)
+    cout << "Arvore geradora minima - Prim: ";
+    for (Aresta arest:AGM)
     {
-        cout << "(" << prim.getIdNoOrigem() << ", " << prim.getIdNoDestino() << ")" << " ";
+        cout << "(" << arest.getIdNoOrigem() << ", " << arest.getIdNoDestino() << ")" << " ";
+        pesoAGM = pesoAGM + arest.getPesoAresta();
     }
+    cout << endl << "Peso AGM: " << pesoAGM << endl;
+
+    return;
+}
+
+void Grafo::Kruskal()
+{
+    int pesoAGM = 0;
+    vector<Aresta> AGM;
+    sort(arestList.begin(), arestList.end());
+
+    int *parent = new int[this->numNos+1];
+    for (int i = 0; i < this->numNos; i++)
+    {
+        parent[i] = -1;
+    }
+
+    for (Aresta arest:arestList)
+    {
+        int origem = arest.getIdNoOrigem();
+        int dest = arest.getIdNoDestino();
+
+        int conjuntoOrigem = encontrarConjunto(parent, origem);
+        int conjuntoDest = encontrarConjunto(parent, dest);
+
+        if (conjuntoOrigem != conjuntoDest)
+        {
+            AGM.push_back(arest);
+            unirConjunto(parent, conjuntoOrigem, conjuntoDest);
+        }
+    }
+
+    // Imprime AGM
+    cout << "Arvore geradora minima - Kruskal: ";
+    for (Aresta arest:AGM)
+    {
+        cout << "(" << arest.getIdNoOrigem() << ", " << arest.getIdNoDestino() << ")" << " ";
+        pesoAGM = pesoAGM + arest.getPesoAresta();
+    }
+    cout << endl << "Peso AGM: " << pesoAGM << endl;
+
+    return;
+}
+
+/*
+    Funcoes Auxiliares Kruskal
+*/
+
+int Grafo::encontrarConjunto(int parent[], int i)
+{
+    if (parent[i] == -1)
+    {
+        return i;
+    }
+    return encontrarConjunto(parent, parent[i]);
+}
+
+void Grafo::unirConjunto(int parent[], int x, int y)
+{
+    int conjuntoX = encontrarConjunto(parent, x);
+    int conjuntoY = encontrarConjunto(parent, y);
+    parent[conjuntoX] = conjuntoY;
+
+    return;
 }

@@ -52,7 +52,7 @@ class Grafo
 
         // --- Funcoes Grafo ---
         void imprimeGrafo();
-        void buscaProfundidade(int idNoInicial);
+        void buscaProfundidade();
         void buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado);
         bool isCiclo();
         bool isCicloAux(int i, vector<bool> &visitado, vector<bool> &visiting);
@@ -67,6 +67,10 @@ class Grafo
         int Floyd(int idOrigem, int idDestino);
         void Prim(int idNoInicial);
         void Kruskal();
+
+        // Auxiliares Kruskal
+        int encontrarConjunto(int parent[], int i);
+        void unirConjunto(int parent[], int x, int y);
     
     private:
         int ordem;
@@ -78,6 +82,7 @@ class Grafo
         No *noRaiz;
         Aresta *arestaMenorPeso;
         NodeList *adjList;
+        vector<Aresta> arestList;
         int **distanceMat;
 };
 
