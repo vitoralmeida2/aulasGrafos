@@ -52,7 +52,7 @@ class Grafo
 
         // --- Funcoes Grafo ---
         void imprimeGrafo();
-        void buscaProfundidade();
+        void buscaProfundidade(int idNoInicial);
         void buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado);
         bool isCiclo();
         bool isCicloAux(int i, vector<bool> &visitado, vector<bool> &visiting);

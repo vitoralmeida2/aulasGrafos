@@ -570,7 +570,7 @@ void Grafo::imprimeGrafo()
 /*
     Funcao que inicia busca em profundidade
 */
-void Grafo::buscaProfundidade()
+void Grafo::buscaProfundidade(int idNoInicial)
 {
     // inicia vetor de visitados com posicoes = false
     vector<bool> visitado(this->numNos+1, false);
@@ -579,10 +579,9 @@ void Grafo::buscaProfundidade()
     {
         if (!visitado[i])
         {
-            buscaProfundidadeVisita(i, visitado);
+            buscaProfundidadeVisita(idNoInicial, visitado);
         }
     }
-    cout << endl;
 }
 
 /*
@@ -591,8 +590,8 @@ void Grafo::buscaProfundidade()
 void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado)
 {
     // Marca o No atual como visitado
-    cout << idNoInicial << " ";
     visitado[idNoInicial] = true;
+    cout << idNoInicial << " ";
 
     // Percorre todos os vertices adjacentes do vertice atual
     for (No *adj:adjList[idNoInicial])
