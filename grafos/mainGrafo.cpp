@@ -7,6 +7,8 @@ int main(int argc, const char* argv[])
 {
     Grafo g(6, false, false, true);
     vector<int> dijkstra;
+    vector<int> centros;
+    vector<int> periferia;
     
     g.insereAresta(1, 2, 3);
     g.insereAresta(1, 4, 2);
@@ -19,8 +21,29 @@ int main(int argc, const char* argv[])
     g.insereAresta(5, 6, 4);
     g.insereAresta(6, 3, 3);
 
+    g.buscaProfundidade(1);
     g.Prim(1);
     g.Kruskal();
+    cout << endl;
+    cout << "Raio : " << g.encontrarRaio() << endl;
+    cout << "Diamentro: " << g.encontrarDiametro() << endl;
+
+    centros = g.encontrarCentro();
+    cout << "Centro: ";
+    for (int i = 0; i < centros.size(); i++)
+    {
+        cout << centros[i] << " ";
+    }
+    cout << endl;
+
+    periferia = g.encontrarPeriferia();
+    cout << "Periferia: ";
+    for (int i = 0; i < periferia.size(); i++)
+    {
+        cout << periferia[i] << " ";
+    }
+    cout << endl;
+
     /*
     
     dijkstra = g.Dijkstra(5);

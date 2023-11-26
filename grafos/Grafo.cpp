@@ -574,24 +574,19 @@ void Grafo::buscaProfundidade(int idNoInicial)
 {
     // inicia vetor de visitados com posicoes = false
     vector<bool> visitado(this->numNos+1, false);
-
-    for (int i = 1; i <= this->numNos; i++)
-    {
-        if (!visitado[i])
-        {
-            buscaProfundidadeVisita(idNoInicial, visitado);
-        }
-    }
+    buscaProfundidadeVisita(idNoInicial, visitado, idNoInicial);
+    cout << endl;
 }
 
 /*
     Funcao para visitar em profundidade
 */
-void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado)
+void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado, int noAnt)
 {
     // Marca o No atual como visitado
     visitado[idNoInicial] = true;
-    cout << idNoInicial << " ";
+    cout << "(" << noAnt << ", " << idNoInicial << ")" << " ";
+    noAnt = idNoInicial;
 
     // Percorre todos os vertices adjacentes do vertice atual
     for (No *adj:adjList[idNoInicial])
@@ -599,9 +594,112 @@ void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado)
         // visitado adjacente se nao visitado
         if (visitado[adj->getIdNo()] == false)
         {
-            buscaProfundidadeVisita(adj->getIdNo(), visitado);
+            buscaProfundidadeVisita(adj->getIdNo(), visitado, noAnt);
         }
     }
+}
+
+/*
+    Funcao para realizar a busca em largura para de encontrar excentricidade 
+*/
+pair<int, int> Grafo::buscaLargura(int idNoInicial)
+{
+    vector<bool> visitado(this->numNos+1, false);
+    vector<int> distancia(this->numNos+1, INFINITO);
+
+    queue<int> fila;
+    fila.push(idNoInicial);
+    visitado[idNoInicial] = true;
+    distancia[idNoInicial] = 0;
+
+    while (!fila.empty())
+    {
+        int atual = fila.front();
+        fila.pop();
+
+        // adicionando nos na fila e calculando distancias
+        for (No *adj:adjList[atual])
+        {
+            if(!visitado[adj->getIdNo()])
+            {
+                visitado[adj->getIdNo()] = true;
+                fila.push(adj->getIdNo());
+                distancia[adj->getIdNo()] = distancia[atual] + 1;
+            }
+        }
+    }
+
+    // Encontrar o vertice mais distante do vertice atual
+    int maxDistancia = 0;
+    int verticeDistante = idNoInicial;
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (distancia[i] > maxDistancia)
+        {
+            maxDistancia = distancia[i];
+            verticeDistante = i;
+        }
+    }
+
+    return {verticeDistante, maxDistancia}; // retorna vertice mais distante de vertice inicial e sua distancia ate ele
+}
+
+int Grafo::encontrarRaio()
+{
+    int raio = INFINITO;
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        pair<int, int> resultado = buscaLargura(i);
+        raio = min(raio, resultado.second);
+    }
+
+    return raio;
+}
+
+int Grafo::encontrarDiametro()
+{
+    int diametro = 0;
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        pair<int, int> resultado = buscaLargura(i);
+        diametro = max(diametro, resultado.second);
+    }
+
+    return diametro;
+}
+
+vector<int> Grafo::encontrarCentro()
+{
+    int raio = encontrarRaio();
+    vector<int> centros;
+
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        pair<int, int> resultado = buscaLargura(i);
+        if (resultado.second == raio)
+        {
+            centros.push_back(i);
+        }
+    }
+
+    return centros;
+}
+
+vector<int> Grafo::encontrarPeriferia()
+{
+    int diametro = encontrarDiametro();
+    vector<int> periferia;
+
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        pair<int, int> resultado = buscaLargura(i);
+        if (resultado.second == diametro)
+        {
+            periferia.push_back(i);
+        }
+    }
+
+    return periferia;
 }
 
 /*
@@ -775,7 +873,7 @@ void Grafo::fechoTransitivoDireto(int idNoInicial)
     {
         // vetor fecho transitivo direto para No inicial
         vector<bool> visitado(this->numNos+1, false);
-        buscaProfundidadeVisita(idNoInicial, visitado);
+        buscaProfundidadeVisita(idNoInicial, visitado, idNoInicial);
 
         cout << "Fecho transitivo direto a partir do No " << idNoInicial << ": ";
         for (int i = 1; i <= this->numNos; i++)
