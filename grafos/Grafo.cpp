@@ -67,6 +67,7 @@ Grafo::~Grafo()
         delete [] distanceMat[i];
     }
     
+    delete [] distanceMat;
     delete [] adjList;
 }
 
@@ -275,7 +276,6 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
             novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
             adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
             distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
-            arestList.push_back(*novaAresta);
             
             // ajusta arestas do no origem
             if (noFonte->getPrimeiraAresta() == NULL)
@@ -324,7 +324,6 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
                 novaAresta = new Aresta(noFonte, noDestino, pesoAresta, NULL);
                 adjList[idNoOrigem].push_back(noDestino); // adicionando adjacencia na lista
                 distanceMat[idNoOrigem][idNoDestino] = pesoAresta; // adicionando distancia na matriz de distancias
-                arestList.push_back(*novaAresta);
 
                 // ajusta arestas
                 if (noFonte->getPrimeiraAresta() == NULL)
@@ -866,4 +865,56 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
     cout << "Aresta de menor peso: " << "(" << this->arestaMenorPeso->getIdNoOrigem() << ", " << this->arestaMenorPeso->getIdNoDestino() << ")" << endl;
 
     return distancesFloyd[idNoOrigem][idNoDestino];
+}
+
+void Grafo::Prim(int idNoInicial)
+{
+    vector<Aresta> AGM; // conjunto de Arestas que representa a arvore
+    vector<bool> visited(this->numNos+1, false); // vetor visitados
+    priority_queue<Aresta> pq; // min Heap para ordenar arestas com base em seu peso
+
+    No *noAux = procurarNoPeloId(idNoInicial);
+    Aresta *arestAux = noAux->getPrimeiraAresta();
+
+    // adiciona arestas saindo do vertice inicial na minHeap
+    visited[idNoInicial] = true;
+    while (arestAux != nullptr)
+    {
+        pq.push(*arestAux);
+        arestAux = arestAux->getProxAresta();
+    }
+
+    // enquanto minHeap nao estiver vazia
+    while (!pq.empty())
+    {
+        Aresta arestAux2 = pq.top();
+        pq.pop();
+
+        int vertex = arestAux2.getIdNoDestino();
+
+        // se formar ciclo, continua para verificar proxima aresta
+        if (visited[vertex])
+            continue;
+
+        // se nao, marca como visitado e adiciona na AGM
+        visited[vertex] = true;
+        AGM.push_back(arestAux2);
+
+        // arestas para os adjacentes de vertex sao adicionadas na minHeap
+        No *noAux2 = procurarNoPeloId(vertex);
+        arestAux = noAux2->getPrimeiraAresta();
+
+        while (arestAux != NULL)
+        {
+            pq.push(*arestAux);
+            arestAux = arestAux->getProxAresta();
+        }
+    }
+
+    // Imprimindo AGM
+    cout << "Arvore geradora minima: ";
+    for (Aresta prim:AGM)
+    {
+        cout << "(" << prim.getIdNoOrigem() << ", " << prim.getIdNoDestino() << ")" << " ";
+    }
 }

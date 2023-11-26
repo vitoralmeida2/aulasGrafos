@@ -65,7 +65,7 @@ class Grafo
         void fechoTransitivoIndireto();
         vector<int> Dijkstra(int idNoInicial);
         int Floyd(int idOrigem, int idDestino);
-        void Prim();
+        void Prim(int idNoInicial);
         void Kruskal();
     
     private:
@@ -77,7 +77,6 @@ class Grafo
         bool pesoArco;
         No *noRaiz;
         Aresta *arestaMenorPeso;
-        vector<Aresta> arestList;
         NodeList *adjList;
         int **distanceMat;
 };

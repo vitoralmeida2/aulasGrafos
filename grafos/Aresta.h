@@ -30,6 +30,11 @@ class Aresta
         No *getNoDestino();
         Aresta *getProxAresta();
 
+        bool operator < (const Aresta &a) const
+        {
+            return pesoAresta > a.pesoAresta;
+        }
+
     private:
         int idNoOrigem;
         int idNoDestino;
