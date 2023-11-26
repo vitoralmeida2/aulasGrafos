@@ -823,7 +823,7 @@ vector<int> Grafo::Dijkstra(int idNoInicial)
         }
     }
 
-    return distancesDijkstra; // retorna vector de distancias 
+    return distancesDijkstra; // retorna vector de distancias (idNoInicial -> todos os outros)
 }
 
 /*
@@ -849,6 +849,7 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
         }
     }
 
+    // Algoritmo de Floyd
     for (int k = 1; k <= this->numNos; k++)
     {
         for (int i = 1; i <= this->numNos; i++)
@@ -864,9 +865,12 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
     }
     cout << "Aresta de menor peso: " << "(" << this->arestaMenorPeso->getIdNoOrigem() << ", " << this->arestaMenorPeso->getIdNoDestino() << ")" << endl;
 
-    return distancesFloyd[idNoOrigem][idNoDestino];
+    return distancesFloyd[idNoOrigem][idNoDestino]; // retorna distancia origem - destino
 }
 
+/*
+    Algoritmo de Prim para encontrar Arvore Geradora Minima do grafo nao orientado
+*/
 void Grafo::Prim(int idNoInicial)
 {
     vector<Aresta> AGM; // conjunto de Arestas que representa a arvore

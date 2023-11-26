@@ -9,10 +9,10 @@ int main(int argc, const char* argv[])
     vector<int> dijkstra;
     
     g.insereAresta(1, 2, 3);
-    g.insereAresta(1, 4, 1);
+    g.insereAresta(1, 4, 2);
     g.insereAresta(2, 3, 2);
     g.insereAresta(2, 5, 2);
-    g.insereAresta(3, 1, 2);
+    g.insereAresta(3, 1, 1);
     g.insereAresta(3, 5, 1);
     g.insereAresta(4, 3, 3);
     g.insereAresta(4, 6, 6);
