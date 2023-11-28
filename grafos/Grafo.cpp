@@ -585,7 +585,13 @@ void Grafo::buscaProfundidadeVisita(int idNoInicial, vector<bool> &visitado, int
 {
     // Marca o No atual como visitado
     visitado[idNoInicial] = true;
-    cout << "(" << noAnt << ", " << idNoInicial << ")" << " ";
+    if (idNoInicial == noAnt)
+    {
+        cout << "(" << idNoInicial << ")" << " ";
+    } else
+        {
+            cout << "(" << noAnt << ", " << idNoInicial << ")" << " ";
+        }
     noAnt = idNoInicial;
 
     // Percorre todos os vertices adjacentes do vertice atual
@@ -653,7 +659,7 @@ int Grafo::encontrarRaio()
         raio = min(raio, resultado.second);
     }
 
-    return raio;
+    return raio; // retorna raio do grafo
 }
 
 int Grafo::encontrarDiametro()
@@ -665,7 +671,7 @@ int Grafo::encontrarDiametro()
         diametro = max(diametro, resultado.second);
     }
 
-    return diametro;
+    return diametro; // retorna diametro do grafo
 }
 
 vector<int> Grafo::encontrarCentro()
@@ -682,7 +688,7 @@ vector<int> Grafo::encontrarCentro()
         }
     }
 
-    return centros;
+    return centros; // retorna vertices que sao centros do grafo
 }
 
 vector<int> Grafo::encontrarPeriferia()
@@ -699,7 +705,7 @@ vector<int> Grafo::encontrarPeriferia()
         }
     }
 
-    return periferia;
+    return periferia; // retorna vertices que sao periferia do grafo
 }
 
 /*
@@ -814,7 +820,13 @@ void Grafo::ordenacaoTopologica()
 {
     if (isCiclo())
     {
-        cout << "O grafo contém um ciclo. Não é possível ordenar topologicamente." << endl;
+        cout << "O grafo contem um ciclo. Nao e possivel ordenar topologicamente." << endl;
+        return;
+    }
+
+    if (!isDigrafo())
+    {
+        cout << "O grafo nao e direcionado." << endl;
         return;
     }
 
@@ -873,16 +885,17 @@ void Grafo::fechoTransitivoDireto(int idNoInicial)
     {
         // vetor fecho transitivo direto para No inicial
         vector<bool> visitado(this->numNos+1, false);
-        buscaProfundidadeVisita(idNoInicial, visitado, idNoInicial);
+        fechoTransitivoDiretoVisita(idNoInicial, visitado);
 
         cout << "Fecho transitivo direto a partir do No " << idNoInicial << ": ";
         for (int i = 1; i <= this->numNos; i++)
         {
             if (visitado[i] == true && i != idNoInicial)
             {
-                cout << i << " ";
+                cout << "(" << i << ")" << " ";
             }
         }
+        cout << endl;
 
     } else
         {
@@ -892,11 +905,66 @@ void Grafo::fechoTransitivoDireto(int idNoInicial)
     return;
 }
 
-void Grafo::fechoTransitivoIndireto()
+/*
+    Funcao para visitar fecho transitivo direto
+*/
+void Grafo::fechoTransitivoDiretoVisita(int idNoInicial, vector<bool> &visitado)
+{
+    // Marca o No atual como visitado
+    visitado[idNoInicial] = true;
+
+    // Percorre todos os vertices adjacentes do vertice atual
+    for (No *adj:adjList[idNoInicial])
+    {
+        // visitado adjacente se nao visitado
+        if (visitado[adj->getIdNo()] == false)
+        {
+            fechoTransitivoDiretoVisita(adj->getIdNo(), visitado);
+        }
+    }
+}
+
+/*
+    Funcao para encontrar fechamentro transitivo indireto usando floyd-warshall
+*/
+void Grafo::fechoTransitivoIndireto(int idNoInicial)
 {
     if (isDigrafo())
     {
-        // codigo
+        // inicia matriz distancias
+        vector<vector<int>> fechamento(this->numNos+1, vector<int>(this->numNos+1, INFINITO));
+        for (int i = 1; i <= this->numNos; i++)
+        {
+            for (int j = 1; j <= this->numNos; j++)
+            {
+                fechamento[i][j] = distanceMat[i][j];
+            }
+        }
+
+        // implementa algoritmo floyd
+        for (int k = 1; k <= this->numNos; k++)
+        {
+            for (int i = 1; i <= this->numNos; i++)
+            {
+                for (int j = 1; j <= this->numNos; j++)
+                {
+                    fechamento[i][j] = fechamento[i][j] || (fechamento[i][k] && fechamento[k][j]);
+                }
+            }
+        }
+
+        // imprime Nos que existe caminho para idNoInicial
+        cout << "Fechamento transitivo indireto para o No" << idNoInicial << ": ";
+        for (int i = 1; i <= this->numNos; i++)
+        {
+            if (fechamento[idNoInicial][i] != INFINITO)
+            {
+                if (idNoInicial == i) continue;
+                cout << "(" << i << ")" << " ";
+            }
+        }
+        cout << endl;
+
     } else
         {
             cout << "Grafo nao e direcionado" << endl;
@@ -981,7 +1049,6 @@ int Grafo::Floyd(int idNoOrigem, int idNoDestino)
             }
         }
     }
-    cout << "Aresta de menor peso: " << "(" << this->arestaMenorPeso->getIdNoOrigem() << ", " << this->arestaMenorPeso->getIdNoDestino() << ")" << endl;
 
     return distancesFloyd[idNoOrigem][idNoDestino]; // retorna distancia origem - destino
 }
@@ -1105,4 +1172,70 @@ void Grafo::unirConjunto(int parent[], int x, int y)
     parent[conjuntoX] = conjuntoY;
 
     return;
+}
+
+void Grafo::nosArticulacao()
+{
+    vector<int> desc(this->numNos+1, -1);
+    vector<int> low(this->numNos+1, -1);
+    vector<bool> visitado(this->numNos+1, false);
+    vector<int> pai(this->numNos+1, -1);
+    vector<bool> pontoArticulacao(this->numNos+1, false);
+
+    int tempo = 0;
+
+    for (int i = 1; i <= this->numNos; i++)
+    {
+        if (!visitado[i])
+        {
+            nosArticulacaoVisita(i, desc, low, visitado, pai, pontoArticulacao, tempo);
+        }
+    }
+
+    cout << "Vertices de articulacao: ";
+    for (int i = 1; i<= this->numNos; i++)
+    {
+        if(pontoArticulacao[i])
+        {
+            cout << "(" << i << ")" << " ";
+        }
+    }
+
+    return;
+}
+
+void Grafo::nosArticulacaoVisita(int v, vector<int> &desc, vector<int> &low, vector<bool> &visitado, vector<int> &pai, vector<bool> &pontoArticulacao, int &tempo)
+{
+    int filhos = 0;
+
+    visitado[v] = true;
+    desc[v] = low[v] = ++tempo;
+
+    for (No *adj:adjList[v])
+    {
+        if (!visitado[adj->getIdNo()])
+        {
+            filhos++;
+            pai[adj->getIdNo()] = v;
+            nosArticulacaoVisita(adj->getIdNo(), desc, low, visitado, pai, pontoArticulacao, tempo);
+
+            low[v] = min(low[v], low[adj->getIdNo()]);
+
+            if (pai[v] == -1 && filhos > 1)
+            {
+                pontoArticulacao[v] = true;
+            }
+
+            if (pai[v] != -1 && low[adj->getIdNo()] >= desc[v])
+            {
+                pontoArticulacao[v] = true;
+            } else
+                {
+                    if (adj->getIdNo() != pai[v])
+                    {
+                        low[v] = min(low[v], desc[adj->getIdNo()]);
+                    }
+                }
+        }
+    }
 }

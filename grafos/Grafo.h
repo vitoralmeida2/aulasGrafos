@@ -67,7 +67,10 @@ class Grafo
         void ordenacaoTopologica();
         void ordenacaoTopologicaVisita(int i, vector<bool> &visitado, stack<int> &pilhaOrdenacao);
         void fechoTransitivoDireto(int idNoInicial);
-        void fechoTransitivoIndireto();
+        void fechoTransitivoDiretoVisita(int idNoInicial, vector<bool> &visitado);
+        void fechoTransitivoIndireto(int idNoInicial);
+        void nosArticulacao();
+        void nosArticulacaoVisita(int v, vector<int> &desc, vector<int> &low, vector<bool> &visitado, vector<int> &pai, vector<bool> &pontoArticulacao, int &tempo);
         vector<int> Dijkstra(int idNoInicial);
         int Floyd(int idOrigem, int idDestino);
         void Prim(int idNoInicial);
