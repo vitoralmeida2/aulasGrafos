@@ -34,7 +34,7 @@ class Grafo
 
         // --- Funcoes do No ---
         No *procurarNoPeloId(int idFindNo);
-        No *insereNo(int idNo, int pesoNo);
+        No *insereNo(int idNo, int x, int y, int pesoNo);
         bool removeNo(int idNo);
 
         // --- Funcoes de Aresta ---
@@ -71,7 +71,7 @@ class Grafo
         void fechoTransitivoIndireto(int idNoInicial);
         void nosArticulacao();
         void nosArticulacaoVisita(int v, vector<int> &desc, vector<int> &low, vector<bool> &visitado, vector<int> &pai, vector<bool> &pontoArticulacao, int &tempo);
-        vector<int> Dijkstra(int idNoInicial);
+        int Dijkstra(int idNoInicial, int idNoDestino);
         int Floyd(int idOrigem, int idDestino);
         void Prim(int idNoInicial);
         void Kruskal();
@@ -79,6 +79,9 @@ class Grafo
         // Auxiliares Kruskal
         int encontrarConjunto(int parent[], int i);
         void unirConjunto(int parent[], int x, int y);
+        
+        void atualizaPesoNos(int idNo, int novoPeso);
+        void atualizaCapacidade(int capacidade);
     
     private:
         int ordem;
@@ -87,6 +90,7 @@ class Grafo
         bool digrafo;
         bool pesoNo;
         bool pesoArco;
+        int capacidade;
         No *noRaiz;
         Aresta *arestaMenorPeso;
         NodeList *adjList;

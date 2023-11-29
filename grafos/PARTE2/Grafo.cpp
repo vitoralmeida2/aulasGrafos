@@ -25,6 +25,7 @@ Grafo::Grafo(int numVertices, bool isDigrafo, bool pesoNO, bool pesoArc)
     this->digrafo = isDigrafo;
     this->pesoNo = pesoNO;
     this->pesoArco = pesoArc;
+    this->capacidade = 0;
     this->noRaiz = NULL;
     this->arestaMenorPeso = NULL;
     adjList = new NodeList[numVertices+1];
@@ -118,14 +119,14 @@ No *Grafo::procurarNoPeloId(int idFindNo)
     A funcao insere o No caso ele nao existe ou atualiza seu peso.
     retorna o No criado ou alterado
 */
-No *Grafo::insereNo(int idNo, int peso) 
+No *Grafo::insereNo(int idNo, int x, int y, int peso) 
 {
     No *aux = procurarNoPeloId(idNo);
 
     // se No nao existe
     if (aux == NULL)
     {
-        No *novoNo = new No(idNo, peso);
+        No *novoNo = new No(idNo, x, y, peso);
 
         if (noRaiz == NULL)
         {
@@ -252,12 +253,12 @@ bool Grafo::insereAresta(int idNoOrigem, int idNoDestino, int pesoAresta)
 
     if (noFonte == NULL)
     {
-        noFonte = insereNo(idNoOrigem, 0);
+        noFonte = insereNo(idNoOrigem, 0, 0, 0);
     }
 
     if (noDestino == NULL)
     {
-        noDestino = insereNo(idNoDestino, 0);
+        noDestino = insereNo(idNoDestino, 0, 0, 0);
     }
 
     // Cria nova aresta ou altera seu peso caso ja exista
@@ -548,6 +549,18 @@ bool Grafo::isDigrafo()
 
 // --- Funcoes Grafo ---
 
+void Grafo::atualizaPesoNos(int idNo, int novoPeso)
+{
+    No *noAux;
+    noAux = procurarNoPeloId(idNo);
+    noAux->setPesoNo(novoPeso);
+}
+
+void Grafo::atualizaCapacidade(int capacity)
+{
+    this->capacidade = capacity;
+}
+
 /*
     imprime o grafo representado em lista de adjacencia
 */
@@ -563,6 +576,7 @@ void Grafo::imprimeGrafo()
         }
         cout << "//" << endl;
     }
+    cout << endl;
 
     return;
 }
@@ -976,7 +990,7 @@ void Grafo::fechoTransitivoIndireto(int idNoInicial)
 /*
     Algoritimo de Dijkstra usado para retorna as distancias entre o idNoInicial e todos os outros vertices
 */
-vector<int> Grafo::Dijkstra(int idNoInicial)
+int Grafo::Dijkstra(int idNoInicial, int idNoDestino)
 {
     // inicial vetor de distancias e define distancia do No inicial para ele mesmo como 0
     vector<int> distancesDijkstra(this->numNos+1, INFINITO);
@@ -1009,7 +1023,7 @@ vector<int> Grafo::Dijkstra(int idNoInicial)
         }
     }
 
-    return distancesDijkstra; // retorna vector de distancias (idNoInicial -> todos os outros)
+    return distancesDijkstra[idNoDestino]; // retorna distancia idNoInicial - idNoDestino
 }
 
 /*
