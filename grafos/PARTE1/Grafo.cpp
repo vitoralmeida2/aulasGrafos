@@ -11,7 +11,7 @@
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
-#define INFINITO INT16_MAX
+#define INFINITO INT32_MAX
 
 using namespace std;
 

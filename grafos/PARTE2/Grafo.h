@@ -80,8 +80,11 @@ class Grafo
         int encontrarConjunto(int parent[], int i);
         void unirConjunto(int parent[], int x, int y);
         
+        // CVRP
         void atualizaPesoNos(int idNo, int novoPeso);
         void atualizaCapacidade(int capacidade);
+        int getCapacidade();
+        vector<No*> getNos();
     
     private:
         int ordem;

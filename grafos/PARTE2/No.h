@@ -38,6 +38,9 @@ class No
         No *getProxNo();
         Aresta *getPrimeiraAresta();
 
+        int getCordX();
+        int getCordY();
+
     private:
         int idNo;
         int cordX, cordY;

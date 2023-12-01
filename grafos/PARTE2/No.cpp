@@ -117,3 +117,13 @@ Aresta *No::getPrimeiraAresta()
 {
     return this->primeiraAresta;
 }
+
+int No::getCordX()
+{
+    return this->cordX;
+}
+
+int No::getCordY()
+{
+    return this->cordY;
+}

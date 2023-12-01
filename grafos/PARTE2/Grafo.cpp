@@ -561,6 +561,25 @@ void Grafo::atualizaCapacidade(int capacity)
     this->capacidade = capacity;
 }
 
+int Grafo::getCapacidade()
+{
+    return this->capacidade;
+}
+
+vector<No*> Grafo::getNos()
+{
+    vector<No*> nos;
+    No *auxNo = this->noRaiz;
+
+    while (auxNo != NULL)
+    {
+        nos.push_back(auxNo);
+        auxNo = auxNo->getProxNo();
+    }
+
+    return nos;    
+}
+
 /*
     imprime o grafo representado em lista de adjacencia
 */
