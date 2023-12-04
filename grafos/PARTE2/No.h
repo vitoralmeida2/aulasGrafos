@@ -28,6 +28,7 @@ class No
         void decGrauSaida();
         void setProxNo(No *novoNo);
         void setPrimeiraAresta(Aresta *novAresta);
+        void setVisitado(bool v);
 
         // --- GET ---
         int getIdNo();
@@ -37,6 +38,7 @@ class No
         int getGrauSaida();
         No *getProxNo();
         Aresta *getPrimeiraAresta();
+        bool getVisitado();
 
         int getCordX();
         int getCordY();
@@ -45,6 +47,7 @@ class No
         int idNo;
         int cordX, cordY;
         int pesoNo;
+        bool visitado;
         int grauEntrada;
         int grauSaida;
         No *proxNo;

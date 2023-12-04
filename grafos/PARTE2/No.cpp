@@ -81,6 +81,11 @@ void No::setPrimeiraAresta(Aresta *novaAresta)
     this->primeiraAresta = novaAresta;
 }
 
+void No::setVisitado(bool v)
+{
+    this->visitado = v;
+}
+
 // --- GET ---
 
 int No::getIdNo() 
@@ -126,4 +131,9 @@ int No::getCordX()
 int No::getCordY()
 {
     return this->cordY;
+}
+
+bool No::getVisitado()
+{
+    return this->visitado;
 }

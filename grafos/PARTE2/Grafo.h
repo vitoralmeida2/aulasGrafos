@@ -21,6 +21,12 @@ typedef list<No*> NodeList; // lista de adjancencia
 
 // --- Definindo class Grafo ---
 
+struct Rota
+{
+    vector<No*> clientes;
+    int capacityUsed;
+};
+
 class Grafo 
 {
     public:
@@ -81,12 +87,18 @@ class Grafo
         void unirConjunto(int parent[], int x, int y);
         
         // Auxiliares CVRP
+        void setInstanceName(string name);
+        string getInstanceName();
         void atualizaPesoNos(int idNo, int novoPeso);
         void setCapacidade(int capacidade);
         int getCapacidade();
         void setVeiculos(int num);
         int getVeiculos();
         vector<No*> getNos();
+        double distance(No *a, No *b);
+        int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
+        void gulosoCVRP();
+        double calculaDistanciaRota(vector<No*> rota);
     
     private:
         int ordem;
@@ -102,6 +114,7 @@ class Grafo
         NodeList *adjList;
         vector<Aresta> arestList;
         int **distanceMat;
+        string instanceName;
 };
 
 #endif // GRAFO_H

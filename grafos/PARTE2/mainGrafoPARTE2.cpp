@@ -2,9 +2,6 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <vector>
-#include <cmath>
-#include <algorithm>
 #include "Grafo.h"
 #define INFINITO INT32_MAX
 
@@ -73,7 +70,7 @@ Grafo *criaGrafoLeInstancia(string nomeArquivo)
     return grafo;
 }
 
-void leDemandas(Grafo *g, string nomeArquivo)
+void leDemandas(Grafo *grafo, string nomeArquivo)
 {
     ifstream arq(nomeArquivo);
     
@@ -88,12 +85,21 @@ void leDemandas(Grafo *g, string nomeArquivo)
 
     while (getline(arq, linha))
     {
+        if (linha.find("NAME : ") != string::npos)
+        {
+            size_t pos = linha.find(":");
+            if (pos != string::npos)
+            {
+                string nomeInstancia = linha.substr(pos + 2);
+                grafo->setInstanceName(nomeInstancia);
+            }
+        }
         if (linha.find("DEMAND_SECTION") != string::npos)
         {
             // leitura demandas
             while (arq >> id >> demand)
             {
-                g->atualizaPesoNos(id, demand);
+                grafo->atualizaPesoNos(id, demand);
             }
         }
     }
@@ -101,116 +107,14 @@ void leDemandas(Grafo *g, string nomeArquivo)
     arq.close();
 }
 
-struct Point
-{
-    double x, y;
-};
-
-struct Cliente
-{
-    int idCliente;
-    Point location;
-    int demand;
-    bool visited;
-};
-
-struct Rota
-{
-    vector<Cliente> clientes;
-    int capacity;
-};
-
-double distance (Point &a, Point &b)
-{
-    return sqrt(pow(a.x - b.x, 2) + pow(a.y - b.y, 2));
-};
-
-int encontraClienteProximo(Point &location, vector<Cliente> &clientes)
-{
-    int clienteProximo = -1;
-    double minDistance = INFINITO;
-
-    for (int i = 0; i < clientes.size(); i++)
-    {
-        if (!clientes[i].visited)
-        {
-            double dist = distance(location, clientes[i].location);
-            if (dist < minDistance)
-            {
-                minDistance = dist;
-                clienteProximo = i;
-            }
-        }
-    }
-
-    return clienteProximo;
-}
-
-vector<Rota> gulosoVRP(vector<Cliente> &clientes, int capacidadeVeiculo)
-{
-    vector<Rota> rotas;
-    vector<Cliente> clientesRestantes = clientes;
-
-    while (!clientesRestantes.empty())
-    {
-        Rota rota;
-        rota.capacity = capacidadeVeiculo;
-
-        // inicio no deposito
-        rota.clientes.push_back(clientes[0]);
-        clientesRestantes[0].visited = true;
-
-        while (true)
-        {
-            int clienteProximo = encontraClienteProximo(rota.clientes.back().location, clientesRestantes);
-            
-            if (clienteProximo == -1)
-            {
-                break; // nao ha clientes que nao foram visitados
-            }
-
-            Cliente &clienteProx = clientesRestantes[clienteProximo];
-
-            // verificando se excede capacidade do veiculo
-            if (rota.capacity >= clienteProx.demand)
-            {
-                rota.capacity -= clienteProx.demand;
-                rota.clientes.push_back(clienteProx);
-                clienteProx.visited = true;
-            } else
-                {
-                    break; // cliente passa para proxima rota
-                }
-        }
-        
-        rotas.push_back(rota);
-    }
-
-    return rotas;
-}
-
-int main()
+int main(int argc, const char* argv[])
 {
     string nomeArquivo = "instancias/modeloInstancia.txt";
     Grafo *grafo;
     grafo = criaGrafoLeInstancia(nomeArquivo);
     leDemandas(grafo, nomeArquivo);
 
-    vector<Rota> rotas;
-    vector<Cliente> clientes;
-    vector<No*> nosClientes;
-    Cliente cl;
-    nosClientes = grafo->getNos();
-    reverse(nosClientes.begin(), nosClientes.end());
-
-    for(No *no:nosClientes)
-    {
-        cl.idCliente = no->getIdNo();
-        cl.location.x = no->getCordX();
-        cl.location.y = no->getCordY();
-        cl.demand = no->getPeso();
-        clientes.push_back(cl);
-    }
+    grafo->gulosoCVRP();
 
     system("pause");
     delete grafo;

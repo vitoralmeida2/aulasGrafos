@@ -8,6 +8,7 @@
 #include <queue>
 #include <limits>
 #include <algorithm>
+#include <cmath>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
@@ -1246,6 +1247,16 @@ void Grafo::nosArticulacaoVisita(int v, vector<int> &desc, vector<int> &low, vec
     Auxliares CVRP
 */
 
+void Grafo::setInstanceName(string name)
+{
+    this->instanceName = name;
+}
+
+string Grafo::getInstanceName()
+{
+    return this->instanceName;
+}
+
 void Grafo::atualizaPesoNos(int idNo, int novoPeso)
 {
     No *noAux;
@@ -1283,6 +1294,103 @@ vector<No*> Grafo::getNos()
         nos.push_back(auxNo);
         auxNo = auxNo->getProxNo();
     }
+    reverse(nos.begin(), nos.end());
 
     return nos;    
+}
+
+/*
+    --- Gulosos ---
+*/
+
+double Grafo::distance(No *a, No *b)
+{
+    return sqrt(pow(a->getCordX() - b->getCordX(), 2) + pow(a->getCordY() - b->getCordY(), 2));
+};
+
+double Grafo::calculaDistanciaRota(vector<No*> rota)
+{
+    double totalDistance = 0;
+
+    for (int i = 1; i < rota.size(); i++)
+    {
+        totalDistance += distance(rota[i-1], rota[i]);
+    }
+
+    return totalDistance;
+}
+
+int Grafo::encontraClienteProximo(No *clienteAtual, vector<No*> clientes)
+{
+    int clienteProximo = -1;
+    double minDistance = INFINITO;
+
+    for (int i = 0; i < clientes.size(); i++)
+    {
+        if (!clientes[i]->getVisitado())
+        {
+            double dist = distance(clienteAtual, clientes[i]);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                clienteProximo = i;
+            }
+        }
+    }
+
+    return clienteProximo;
+}
+
+void Grafo::gulosoCVRP()
+{
+    double custoTotal;
+    vector<No*> clientesRestante = this->getNos();
+    vector<Rota> rotas(this->getVeiculos());
+
+    for (int i = 0; i < this->getVeiculos(); i++)
+    {
+        Rota &rotaTemp = rotas[i];
+        rotaTemp.capacityUsed = 0;
+
+        // Iniciando no deposito
+        rotaTemp.clientes.push_back(clientesRestante[0]);
+        clientesRestante[0]->setVisitado(true);
+
+        while (true)
+        {
+            int clienteProximo = encontraClienteProximo(rotaTemp.clientes.back(), clientesRestante);
+            
+            if (clienteProximo == -1)
+                break; // nao ha Clientes nao visitados
+
+            No *clientProx = clientesRestante[clienteProximo];
+
+            // testando capacidade
+            if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+            {
+                rotaTemp.capacityUsed += clientProx->getPeso();
+                rotaTemp.clientes.push_back(clientProx);
+                clientProx->setVisitado(true);
+            } else
+                {
+                    break; // rota cheia passa pro proximo veiculo
+                }
+        }
+        rotaTemp.clientes.push_back(clientesRestante[0]);
+    }
+
+    // Imprimindo rotas
+    cout << "Instancia: " << this->getInstanceName() << endl;
+    for (int i = 0; i < this->numVeiculos; i++)
+    {
+        cout << "Rota #" << i+1 << ": ";
+        for (No *client:rotas[i].clientes)
+        {
+            cout << client->getIdNo() << " ";
+        }
+        cout << endl;
+        double routeDistance = this->calculaDistanciaRota(rotas[i].clientes);
+        custoTotal += routeDistance;
+    }
+    cout << "Custo total: " << custoTotal << endl;
 }
