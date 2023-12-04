@@ -80,10 +80,12 @@ class Grafo
         int encontrarConjunto(int parent[], int i);
         void unirConjunto(int parent[], int x, int y);
         
-        // CVRP
+        // Auxiliares CVRP
         void atualizaPesoNos(int idNo, int novoPeso);
-        void atualizaCapacidade(int capacidade);
+        void setCapacidade(int capacidade);
         int getCapacidade();
+        void setVeiculos(int num);
+        int getVeiculos();
         vector<No*> getNos();
     
     private:
@@ -93,6 +95,7 @@ class Grafo
         bool digrafo;
         bool pesoNo;
         bool pesoArco;
+        int numVeiculos;
         int capacidade;
         No *noRaiz;
         Aresta *arestaMenorPeso;

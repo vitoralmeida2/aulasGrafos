@@ -549,37 +549,6 @@ bool Grafo::isDigrafo()
 
 // --- Funcoes Grafo ---
 
-void Grafo::atualizaPesoNos(int idNo, int novoPeso)
-{
-    No *noAux;
-    noAux = procurarNoPeloId(idNo);
-    noAux->setPesoNo(novoPeso);
-}
-
-void Grafo::atualizaCapacidade(int capacity)
-{
-    this->capacidade = capacity;
-}
-
-int Grafo::getCapacidade()
-{
-    return this->capacidade;
-}
-
-vector<No*> Grafo::getNos()
-{
-    vector<No*> nos;
-    No *auxNo = this->noRaiz;
-
-    while (auxNo != NULL)
-    {
-        nos.push_back(auxNo);
-        auxNo = auxNo->getProxNo();
-    }
-
-    return nos;    
-}
-
 /*
     imprime o grafo representado em lista de adjacencia
 */
@@ -1271,4 +1240,49 @@ void Grafo::nosArticulacaoVisita(int v, vector<int> &desc, vector<int> &low, vec
                 }
         }
     }
+}
+
+/*
+    Auxliares CVRP
+*/
+
+void Grafo::atualizaPesoNos(int idNo, int novoPeso)
+{
+    No *noAux;
+    noAux = procurarNoPeloId(idNo);
+    noAux->setPesoNo(novoPeso);
+}
+
+void Grafo::setCapacidade(int capacity)
+{
+    this->capacidade = capacity;
+}
+
+int Grafo::getCapacidade()
+{
+    return this->capacidade;
+}
+
+void Grafo::setVeiculos(int num)
+{
+    this->numVeiculos = num;
+}
+
+int Grafo::getVeiculos()
+{
+    return this->numVeiculos;
+}
+
+vector<No*> Grafo::getNos()
+{
+    vector<No*> nos;
+    No *auxNo = this->noRaiz;
+
+    while (auxNo != NULL)
+    {
+        nos.push_back(auxNo);
+        auxNo = auxNo->getProxNo();
+    }
+
+    return nos;    
 }

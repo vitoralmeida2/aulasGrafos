@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include "Grafo.h"
 #define INFINITO INT32_MAX
 
@@ -12,7 +13,7 @@ using namespace std;
 Grafo *criaGrafoLeInstancia(string nomeArquivo)
 {
     ifstream arq(nomeArquivo);
-
+    
     if (!arq.is_open())
     {
         cout << "Erro ao abrir o arquivo." << endl;
@@ -20,43 +21,84 @@ Grafo *criaGrafoLeInstancia(string nomeArquivo)
     }
 
     Grafo *grafo;
-    
     string linha;
-    int numNos, id, x, y, demand, capacity;
-    while(getline(arq, linha))
+    int numNos, veiculos, capacity, id, x, y, demand;
+
+    while (getline(arq, linha))
     {
         if (linha.find("DIMENSION") != string::npos)
         {
-            // Extrai quantidade de nos
             stringstream ss(linha);
             string dimensionStr;
             ss >> dimensionStr >> numNos;
             grafo = new Grafo(numNos, false, true, true);
-        } else if (linha.find("CAPACITY") != string::npos)
+        } else if (linha.find("No of trucks") != string::npos)
+            {
+                size_t posInicio = linha.find("No of trucks:");
+                if (posInicio != string::npos)
                 {
-                    // Extrai capacidade
-                    stringstream ss(linha);
-                    string capacidadeStr;
-                    ss >> capacidadeStr >> capacity;
-                    grafo->atualizaCapacidade(capacity);
+                    size_t posFim = linha.find(",", posInicio);
+                    if (posFim != string::npos)
+                    {
+                        string truckStr = linha.substr(posInicio + 13, posFim - posInicio - 13);
+                        veiculos = stoi(truckStr);
+                    }
+                }
+            } else if (linha.find("CAPACITY") != string::npos)
+                {
+                    istringstream iss(linha);
+                    string palavra, espaco, valor;
+                    iss >> palavra >> espaco >> valor;
+                    capacity = stoi(valor);
                 } else if (linha.find("NODE_COORD_SECTION") != string::npos)
+                    {
+                        while (arq >> id >> x >> y)
                         {
-                            // leitura coordenadas
-                            while (arq >> id >> x >> y)
+                            grafo->insereNo(id, x, y, 0);
+                        }
+                    } else if (linha.find("DEMAND_SECTION") != string::npos)
+                        {
+                            cout << "teste";
+                            while (arq >> id >> demand)
                             {
-                                grafo->insereNo(id, x, y, 0);
+                                grafo->atualizaPesoNos(id, demand);
                             }
-                        } else if (linha.find("DEMAND_SECTION") != string::npos)
-                                {
-                                    // leitura demandas
-                                    while (arq >> id >> demand)
-                                    {
-                                        grafo->atualizaPesoNos(id, demand);
-                                    }
-                                }
+                        }
     }
+
+    grafo->setCapacidade(capacity);
+    grafo->setVeiculos(veiculos);
     
+    arq.close();
     return grafo;
+}
+
+void leDemandas(Grafo *g, string nomeArquivo)
+{
+    ifstream arq(nomeArquivo);
+    
+    if (!arq.is_open())
+    {
+        cout << "Erro ao abrir o arquivo." << endl;
+        return;
+    }
+
+    string linha;
+    int id, demand;
+
+    while (getline(arq, linha))
+    {
+        if (linha.find("DEMAND_SECTION") != string::npos)
+        {
+            // leitura demandas
+            while (arq >> id >> demand)
+            {
+                g->atualizaPesoNos(id, demand);
+            }
+        }
+    }
+
+    arq.close();
 }
 
 struct Point
@@ -152,13 +194,14 @@ int main()
     string nomeArquivo = "instancias/modeloInstancia.txt";
     Grafo *grafo;
     grafo = criaGrafoLeInstancia(nomeArquivo);
-    cout << grafo->getOrdem() << endl;
+    leDemandas(grafo, nomeArquivo);
 
     vector<Rota> rotas;
     vector<Cliente> clientes;
     vector<No*> nosClientes;
     Cliente cl;
     nosClientes = grafo->getNos();
+    reverse(nosClientes.begin(), nosClientes.end());
 
     for(No *no:nosClientes)
     {
@@ -169,85 +212,7 @@ int main()
         clientes.push_back(cl);
     }
 
-    rotas = gulosoVRP(clientes, grafo->getCapacidade());
-
-    // imprimindo rotas
-    for(int i = 0; i < rotas.size(); i++)
-    {
-        cout << "Rota [" << i+1 << "]: ";
-        for (Cliente c:rotas[i].clientes)
-        {
-            cout << c.idCliente << " ";
-        }
-    }
-
+    system("pause");
     delete grafo;
     return 0;
 }
-
-/*
-
-std::vector<Route> greedyVRP(const std::vector<Customer>& customers, int vehicleCapacity) {
-    std::vector<Route> routes;
-    std::vector<Customer> remainingCustomers = customers;
-
-    while (!remainingCustomers.empty()) {
-        Route route;
-        route.capacity = vehicleCapacity;
-
-        // Start from the depot (assumed to be at index 0)
-        route.customers.push_back(customers[0]);
-        remainingCustomers[0].visited = true;
-
-        while (true) {
-            int closestCustomerIndex = findClosestCustomer(route.customers.back().location, remainingCustomers);
-
-            if (closestCustomerIndex == -1)
-                break; // No more unvisited customers
-
-            Customer& closestCustomer = remainingCustomers[closestCustomerIndex];
-
-            // Check if adding the closest customer exceeds the vehicle capacity
-            if (route.capacity >= closestCustomer.demand) {
-                route.capacity -= closestCustomer.demand;
-                route.customers.push_back(closestCustomer);
-                closestCustomer.visited = true;
-            } else {
-                break; // Move to the next route
-            }
-        }
-
-        routes.push_back(route);
-    }
-
-    return routes;
-}
-
-int main() {
-    // Example usage
-    std::vector<Customer> customers = {
-        {{0, 0}, 0},    // Depot
-        {{1, 2}, 10},   // Customer 1
-        {{3, 4}, 5},    // Customer 2
-        {{5, 6}, 8}     // Customer 3
-        // Add more customers as needed
-    };
-
-    int vehicleCapacity = 15;
-
-    std::vector<Route> routes = greedyVRP(customers, vehicleCapacity);
-
-    // Output the routes
-    for (size_t i = 0; i < routes.size(); ++i) {
-        std::cout << "Route " << i + 1 << ": ";
-        for (const auto& customer : routes[i].customers) {
-            std::cout << "Customer " << &customer - &customers[0] << " ";
-        }
-        std::cout << std::endl;
-    }
-
-    return 0;
-}
-
-
-*/
