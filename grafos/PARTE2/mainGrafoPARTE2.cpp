@@ -113,8 +113,15 @@ int main(int argc, const char* argv[])
     Grafo *grafo;
     grafo = criaGrafoLeInstancia(nomeArquivo);
     leDemandas(grafo, nomeArquivo);
+    double alpha = 0.3;
 
+    cout << " --- Guloso --- " << endl << endl;
     grafo->gulosoCVRP();
+    cout << endl << endl;
+
+    cout << " --- Guloso Randomizado --- " << endl << endl;
+    grafo->gulosoRandomizadoCVRP(alpha);
+    cout << endl << endl;
 
     system("pause");
     delete grafo;

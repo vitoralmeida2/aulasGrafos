@@ -9,10 +9,11 @@
 #include <limits>
 #include <algorithm>
 #include <cmath>
+#include <random>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
-#define INFINITO INT16_MAX
+#define INFINITO INT32_MAX
 
 using namespace std;
 
@@ -1299,6 +1300,14 @@ vector<No*> Grafo::getNos()
     return nos;    
 }
 
+void Grafo::setNosNaoVisitados(vector<No*> clientes)
+{
+    for (No* cl:clientes)
+    {
+        cl->setVisitado(false);
+    }
+}
+
 /*
     --- Gulosos ---
 */
@@ -1341,9 +1350,60 @@ int Grafo::encontraClienteProximo(No *clienteAtual, vector<No*> clientes)
     return clienteProximo;
 }
 
+int Grafo::encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha)
+{
+    vector<int> indicesNaoVisitados;
+
+    for (int i = 0; i < clientesRestantes.size(); i++)
+    {
+        if(!clientesRestantes[i]->getVisitado())
+        {
+            indicesNaoVisitados.push_back(i);
+        }
+    }
+
+    if (indicesNaoVisitados.empty())
+    {
+        return -1; // nao ha clientes nao visitados
+    }
+
+    // Escolhendo aleatoriamente indices de clientes nao visitados
+    random_device rd;
+    mt19937 gen(rd());
+
+    int clienteIndex = -1;
+    
+    if (uniform_real_distribution<>(0, 1)(gen) < alpha && !indicesNaoVisitados.empty())
+    {
+        // escolhe aleatoriamente cliente mais proximo
+        double minDistance = INFINITO;
+        vector<pair<int, double>> clientesProximos;
+
+        for (int index:indicesNaoVisitados)
+        {
+            double dist = distance(clienteAtual, clientesRestantes[index]);
+            clientesProximos.push_back(make_pair(index, dist));
+        }
+
+        // ordena pelo criterio de proximidade
+        sort(clientesProximos.begin(), clientesProximos.end(), [](auto &a, auto &b) {
+            return a.second < b.second;
+        });
+
+        return clientesProximos.front().first;
+        
+    } else
+        {
+            // escolhe aleatoriamente
+            uniform_int_distribution<> randomDis(0, indicesNaoVisitados.size() - 1);
+            return indicesNaoVisitados[randomDis(gen)];
+        }
+
+}
+
 void Grafo::gulosoCVRP()
 {
-    double custoTotal;
+    double custoTotal = 0;
     vector<No*> clientesRestante = this->getNos();
     vector<Rota> rotas(this->getVeiculos());
 
@@ -1376,6 +1436,63 @@ void Grafo::gulosoCVRP()
                     break; // rota cheia passa pro proximo veiculo
                 }
         }
+        rotaTemp.clientes.push_back(clientesRestante[0]);
+    }
+
+    // Imprimindo rotas
+    cout << "Instancia: " << this->getInstanceName() << endl;
+    for (int i = 0; i < this->numVeiculos; i++)
+    {
+        cout << "Rota #" << i+1 << ": ";
+        for (No *client:rotas[i].clientes)
+        {
+            cout << client->getIdNo() << " ";
+        }
+        cout << endl;
+        double routeDistance = this->calculaDistanciaRota(rotas[i].clientes);
+        custoTotal += routeDistance;
+    }
+    cout << "Custo total: " << custoTotal << endl;
+}
+
+void Grafo::gulosoRandomizadoCVRP(double alpha)
+{
+    double custoTotal = 0;
+    vector<No*> clientesRestante = this->getNos();
+    setNosNaoVisitados(clientesRestante);
+    vector<Rota> rotas(this->getVeiculos());
+
+    for (int i = 0; i < this->getVeiculos(); i++)
+    {
+        Rota &rotaTemp = rotas[i];
+        rotaTemp.capacityUsed = 0;
+
+        // Iniciando no deposito
+        rotaTemp.clientes.push_back(clientesRestante[0]);
+        clientesRestante[0]->setVisitado(true);
+
+        while (true)
+        {
+            // Escolhendo aleatoriamente um cliente proximo nao visitado
+            int randomClienteIndice = encontraClienteProxAleatorio(clientesRestante, rotaTemp.clientes.back() ,alpha);
+
+            if (randomClienteIndice == -1)
+                break; // nao ha clientes nao visitados
+
+            No *clientProx = clientesRestante[randomClienteIndice];
+
+            // testando capacidade
+            if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+            {
+                rotaTemp.capacityUsed += clientProx->getPeso();
+                rotaTemp.clientes.push_back(clientProx);
+                clientProx->setVisitado(true);
+            } else
+                {
+                    break; // rota cheia passa pro proximo veiculo
+                }
+        }
+        // adicionando retorno ao deposito
         rotaTemp.clientes.push_back(clientesRestante[0]);
     }
 

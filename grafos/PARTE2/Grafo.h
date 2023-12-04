@@ -98,7 +98,11 @@ class Grafo
         double distance(No *a, No *b);
         int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
         void gulosoCVRP();
+        void gulosoRandomizadoCVRP(double alpha);
         double calculaDistanciaRota(vector<No*> rota);
+        int encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
+
+        void setNosNaoVisitados(vector<No*> clientes);
     
     private:
         int ordem;
