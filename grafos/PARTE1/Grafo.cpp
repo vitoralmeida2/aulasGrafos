@@ -979,38 +979,45 @@ void Grafo::fechoTransitivoIndireto(int idNoInicial)
 */
 int Grafo::Dijkstra(int idNoInicial, int idNoDestino)
 {
-    // inicial vetor de distancias e define distancia do No inicial para ele mesmo como 0
-    vector<int> distancesDijkstra(this->numNos+1, INFINITO);
-    distancesDijkstra[idNoInicial] = 0;
-
-    // fila de pares que representa a distancia e o no antecedente <distancia do No inicial até No X, No que antecede X>
-    queue<pair<int, int>> fila;
-    fila.push({0, idNoInicial});
-
-    // enquanto fila nao esta vazia
-    while (!fila.empty())
+    if (this->digrafo)
     {
-        int distance = fila.front().first;
-        int vertex = fila.front().second;
-        fila.pop();
+        // inicial vetor de distancias e define distancia do No inicial para ele mesmo como 0
+        vector<int> distancesDijkstra(this->numNos+1, INFINITO);
+        distancesDijkstra[idNoInicial] = 0;
 
-        // se distancia em distantecDijkstra ja e a menor, continue
-        if (distance > distancesDijkstra[vertex])
-            continue;
-        // se nao:
-        // para cada vizinho do vertice atual, calcula nova distancia
-        for(int i = 1; i <= this->numNos; i++)
+        // fila de pares que representa a distancia e o no antecedente <distancia do No inicial até No X, No que antecede X>
+        queue<pair<int, int>> fila;
+        fila.push({0, idNoInicial});
+
+        // enquanto fila nao esta vazia
+        while (!fila.empty())
         {
-            int newDistance = distance + this->distanceMat[vertex][i];
-            if (newDistance < distancesDijkstra[i])
+            int distance = fila.front().first;
+            int vertex = fila.front().second;
+            fila.pop();
+
+            // se distancia em distantecDijkstra ja e a menor, continue
+            if (distance > distancesDijkstra[vertex])
+                continue;
+            // se nao:
+            // para cada vizinho do vertice atual, calcula nova distancia
+            for(int i = 1; i <= this->numNos; i++)
             {
-                distancesDijkstra[i] = newDistance;
-                fila.push({newDistance, i});
+                int newDistance = distance + this->distanceMat[vertex][i];
+                if (newDistance < distancesDijkstra[i])
+                {
+                    distancesDijkstra[i] = newDistance;
+                    fila.push({newDistance, i});
+                }
             }
         }
-    }
 
-    return distancesDijkstra[idNoDestino]; // retorna distancia idNoInicial - idNoDestino
+        return distancesDijkstra[idNoDestino]; // retorna distancia idNoInicial - idNoDestino
+    } else
+        {
+            cout << "Grafo nao direcionado!" << endl;
+            return -1;
+        }
 }
 
 /*
@@ -1018,40 +1025,47 @@ int Grafo::Dijkstra(int idNoInicial, int idNoDestino)
 */
 int Grafo::Floyd(int idNoOrigem, int idNoDestino)
 {
-    // inicia matriz com todos valores = INFINITO
-    vector<vector<int>> distancesFloyd(this->numNos+1, vector<int>(this->numNos+1, INFINITO));
-
-    // seta diagonal = 0 e insere distancias
-    for (int i = 1; i <= this->numNos; i++)
+    if(this->digrafo)
     {
-        for (int j = 1; j <= this->numNos; j++)
-        {
-            if (i == j)
-            {
-                distancesFloyd[i][j] = 0;
-                continue;
-            }
+        // inicia matriz com todos valores = INFINITO
+        vector<vector<int>> distancesFloyd(this->numNos+1, vector<int>(this->numNos+1, INFINITO));
 
-            distancesFloyd[i][j] = this->distanceMat[i][j];
-        }
-    }
-
-    // Algoritmo de Floyd
-    for (int k = 1; k <= this->numNos; k++)
-    {
+        // seta diagonal = 0 e insere distancias
         for (int i = 1; i <= this->numNos; i++)
         {
             for (int j = 1; j <= this->numNos; j++)
             {
-                if (distancesFloyd[i][j] > distancesFloyd[i][k] + distancesFloyd[k][j])
+                if (i == j)
                 {
-                    distancesFloyd[i][j] = distancesFloyd[i][k] + distancesFloyd[k][j];
+                    distancesFloyd[i][j] = 0;
+                    continue;
+                }
+
+                distancesFloyd[i][j] = this->distanceMat[i][j];
+            }
+        }
+
+        // Algoritmo de Floyd
+        for (int k = 1; k <= this->numNos; k++)
+        {
+            for (int i = 1; i <= this->numNos; i++)
+            {
+                for (int j = 1; j <= this->numNos; j++)
+                {
+                    if (distancesFloyd[i][j] > distancesFloyd[i][k] + distancesFloyd[k][j])
+                    {
+                        distancesFloyd[i][j] = distancesFloyd[i][k] + distancesFloyd[k][j];
+                    }
                 }
             }
         }
-    }
 
-    return distancesFloyd[idNoOrigem][idNoDestino]; // retorna distancia origem - destino
+        return distancesFloyd[idNoOrigem][idNoDestino]; // retorna distancia origem - destino
+    } else
+        {
+            cout << "Grafo nao e direcionado!" << endl;
+            return -1;
+        }
 }
 
 /*
@@ -1114,6 +1128,9 @@ void Grafo::Prim(int idNoInicial)
     return;
 }
 
+/*
+    Algoritmo de Kruskal para obter a arvores geradora minima do grafo
+*/
 void Grafo::Kruskal()
 {
     int pesoAGM = 0;
@@ -1121,7 +1138,7 @@ void Grafo::Kruskal()
     sort(arestList.begin(), arestList.end());
 
     int *parent = new int[this->numNos+1];
-    for (int i = 0; i < this->numNos; i++)
+    for (int i = 1; i <= this->numNos; i++)
     {
         parent[i] = -1;
     }
@@ -1150,6 +1167,7 @@ void Grafo::Kruskal()
     }
     cout << endl << "Peso AGM: " << pesoAGM << endl;
 
+    delete [] parent;
     return;
 }
 

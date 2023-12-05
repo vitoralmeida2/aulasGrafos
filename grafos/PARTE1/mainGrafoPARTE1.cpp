@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Grafo *criaGrafoLeInformacoes()
+Grafo *criaGrafoLeInformacoes(bool digrafo, bool ponderado)
 {
     ifstream arq("instancias/grafo_teste1.txt");
     
@@ -17,12 +17,21 @@ Grafo *criaGrafoLeInformacoes()
     int numVertices, idOrigem, idDestino, pesoAresta;
     arq >> numVertices;
 
-    Grafo *g = new Grafo(numVertices, true, false, true);
+    Grafo *g = new Grafo(numVertices, digrafo, false, ponderado);
 
-    while(arq >> idOrigem >> idDestino >> pesoAresta)
+    if (ponderado)
     {
-        g->insereAresta(idOrigem, idDestino, pesoAresta);
-    }
+        while(arq >> idOrigem >> idDestino >> pesoAresta)
+        {
+            g->insereAresta(idOrigem, idDestino, pesoAresta);
+        }
+    } else
+        {
+            while(arq >> idOrigem >> idDestino)
+            {
+                g->insereAresta(idOrigem, idDestino, 1);
+            }
+        }
 
     arq.close();
 
@@ -32,8 +41,8 @@ Grafo *criaGrafoLeInformacoes()
 int main(int argc, const char* argv[])
 {
     int menu, Dijkstra;
-    int numNos = 6;
-    bool digrafo, pesoNos, pesoArestas;
+    bool digrafo = false;
+    bool ponderado = false;
     
     Grafo *grafo;
     
@@ -66,7 +75,7 @@ int main(int argc, const char* argv[])
         switch (menu)
         {
             case 1:
-                grafo = criaGrafoLeInformacoes();
+                grafo = criaGrafoLeInformacoes(digrafo, ponderado);
                 break;
 
             case 2:
@@ -111,8 +120,6 @@ int main(int argc, const char* argv[])
                 break;
 
             case 8:
-                cout << "Insira o ID de origem: ";
-                cin >> aux;
                 grafo->Kruskal();
                 cout << endl;
                 break;
@@ -152,7 +159,6 @@ int main(int argc, const char* argv[])
                 break;
 
             case 12:
-                cout << "Vertices de articulacao: ";
                 grafo->nosArticulacao();
                 cout << endl;
                 break;
