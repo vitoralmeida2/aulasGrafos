@@ -10,12 +10,13 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
 #include "Grafo.h"
 #include "Aresta.h"
 #include "No.h"
 #define INFINITO INT32_MAX
-
-using namespace std;
 
 // --- Construtor ---
 
@@ -1319,7 +1320,7 @@ double Grafo::distance(No *a, No *b)
 
 double Grafo::calculaDistanciaRota(vector<No*> rota)
 {
-    double totalDistance = 0;
+    double totalDistance = 0.0;
 
     for (int i = 1; i < rota.size(); i++)
     {
@@ -1327,6 +1328,17 @@ double Grafo::calculaDistanciaRota(vector<No*> rota)
     }
 
     return totalDistance;
+}
+
+double Grafo::calculateSolutionCost(Solution &sol)
+{
+    double custoTotal = 0.0;
+    for (auto rota:sol.rotas)
+    {
+        custoTotal += calculaDistanciaRota(rota.clientes);
+    }
+
+    return custoTotal;
 }
 
 int Grafo::encontraClienteProximo(No *clienteAtual, vector<No*> clientes)
@@ -1368,15 +1380,15 @@ int Grafo::encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clien
     }
 
     // Escolhendo aleatoriamente indices de clientes nao visitados
-    random_device rd;
-    mt19937 gen(rd());
+    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
+    mt19937 gen(seed);
 
     int clienteIndex = -1;
     
     if (uniform_real_distribution<>(0, 1)(gen) < alpha && !indicesNaoVisitados.empty())
     {
-        // escolhe aleatoriamente cliente mais proximo
-        double minDistance = INFINITO;
+        // Escolhe aleatoriamente um dos 5 clientes mais proximos
+        int numClientesProximos = min(5, static_cast<int>(indicesNaoVisitados.size()));
         vector<pair<int, double>> clientesProximos;
 
         for (int index:indicesNaoVisitados)
@@ -1385,12 +1397,14 @@ int Grafo::encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clien
             clientesProximos.push_back(make_pair(index, dist));
         }
 
-        // ordena pelo criterio de proximidade
+        // Ordena pelo criterio de proximidade
         sort(clientesProximos.begin(), clientesProximos.end(), [](auto &a, auto &b) {
             return a.second < b.second;
         });
 
-        return clientesProximos.front().first;
+        // Escolhe aleatoriamente um dos 5 clientes mais proximos
+        uniform_int_distribution<> randomDis(0, numClientesProximos - 1);
+        return clientesProximos[randomDis(gen)].first;
         
     } else
         {
@@ -1401,9 +1415,10 @@ int Grafo::encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clien
 
 }
 
-void Grafo::gulosoCVRP()
+Solution Grafo::gulosoCVRP()
 {
-    double custoTotal = 0;
+    Solution sol;
+    sol.cost = 0.0;
     vector<No*> clientesRestante = this->getNos();
     vector<Rota> rotas(this->getVeiculos());
 
@@ -1416,7 +1431,7 @@ void Grafo::gulosoCVRP()
         rotaTemp.clientes.push_back(clientesRestante[0]);
         clientesRestante[0]->setVisitado(true);
 
-        while (true)
+        while (true) // constroi rotas
         {
             int clienteProximo = encontraClienteProximo(rotaTemp.clientes.back(), clientesRestante);
             
@@ -1430,6 +1445,7 @@ void Grafo::gulosoCVRP()
             {
                 rotaTemp.capacityUsed += clientProx->getPeso();
                 rotaTemp.clientes.push_back(clientProx);
+                clientesRestante.erase(clientesRestante.begin() + clienteProximo);
                 clientProx->setVisitado(true);
             } else
                 {
@@ -1439,61 +1455,85 @@ void Grafo::gulosoCVRP()
         rotaTemp.clientes.push_back(clientesRestante[0]);
     }
 
+    sol.rotas = rotas;
+    sol.clientesRestantes = clientesRestante;
+    sol.cost = calculateSolutionCost(sol);
+
     // Imprimindo rotas
     cout << "Instancia: " << this->getInstanceName() << endl;
     for (int i = 0; i < this->numVeiculos; i++)
     {
         cout << "Rota #" << i+1 << ": ";
-        for (No *client:rotas[i].clientes)
+        for (No *client:sol.rotas[i].clientes)
         {
             cout << client->getIdNo() << " ";
         }
         cout << endl;
-        double routeDistance = this->calculaDistanciaRota(rotas[i].clientes);
-        custoTotal += routeDistance;
     }
-    cout << "Custo total: " << custoTotal << endl;
+    cout << "Custo total: " << sol.cost << endl << endl;
+
+    return sol;
 }
 
-void Grafo::gulosoRandomizadoCVRP(double alpha)
+Solution Grafo::gulosoRandomizadoCVRP(double alpha)
 {
-    double custoTotal = 0;
-    vector<No*> clientesRestante = this->getNos();
-    setNosNaoVisitados(clientesRestante);
-    vector<Rota> rotas(this->getVeiculos());
+    Solution bestSolution;
+    bestSolution.cost = INFINITO;
+    vector<No*> clientes = this->getNos();
 
-    for (int i = 0; i < this->getVeiculos(); i++)
+    for (int exec = 0; exec < 100; exec++) // numero de execucoes do algoritmo
     {
-        Rota &rotaTemp = rotas[i];
-        rotaTemp.capacityUsed = 0;
+        Solution solAtual;
+        vector<No*> clientesRestante = clientes;
+        setNosNaoVisitados(clientesRestante);
+        vector<Rota> rotas(this->getVeiculos());
 
-        // Iniciando no deposito
-        rotaTemp.clientes.push_back(clientesRestante[0]);
-        clientesRestante[0]->setVisitado(true);
-
-        while (true)
+        for (int i = 0; i < this->getVeiculos(); i++)
         {
-            // Escolhendo aleatoriamente um cliente proximo nao visitado
-            int randomClienteIndice = encontraClienteProxAleatorio(clientesRestante, rotaTemp.clientes.back() ,alpha);
+            Rota &rotaTemp = rotas[i];
+            rotaTemp.capacityUsed = 0;
 
-            if (randomClienteIndice == -1)
-                break; // nao ha clientes nao visitados
+            // Iniciando no deposito
+            rotaTemp.clientes.push_back(clientesRestante[0]);
+            clientesRestante[0]->setVisitado(true);
 
-            No *clientProx = clientesRestante[randomClienteIndice];
-
-            // testando capacidade
-            if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+            while (true)
             {
-                rotaTemp.capacityUsed += clientProx->getPeso();
-                rotaTemp.clientes.push_back(clientProx);
-                clientProx->setVisitado(true);
-            } else
+                // Escolhendo aleatoriamente um cliente proximo nao visitado
+                int randomClienteIndice = encontraClienteProxAleatorio(clientesRestante, rotaTemp.clientes.back() ,alpha);
+
+                if (randomClienteIndice == -1)
+                    break; // nao ha clientes nao visitados
+
+                No *clientProx = clientesRestante[randomClienteIndice];
+
+                // testando capacidade
+                if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
                 {
-                    break; // rota cheia passa pro proximo veiculo
-                }
+                    rotaTemp.capacityUsed += clientProx->getPeso();
+                    rotaTemp.clientes.push_back(clientProx);
+                    clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
+                    clientProx->setVisitado(true);
+                } else
+                    {
+                        break; // rota cheia passa pro proximo veiculo
+                    }
+            }
+            // adicionando retorno ao deposito
+            rotaTemp.clientes.push_back(clientes[0]);
         }
-        // adicionando retorno ao deposito
-        rotaTemp.clientes.push_back(clientesRestante[0]);
+
+        // comparando solucao atual com a melhor solucao
+        solAtual.rotas = rotas;
+        solAtual.clientesRestantes = clientesRestante;
+        solAtual.cost = calculateSolutionCost(solAtual);
+
+        if (solAtual.cost < bestSolution.cost)
+        {
+            bestSolution.cost = solAtual.cost;
+            bestSolution.rotas = solAtual.rotas;
+            bestSolution.clientesRestantes = solAtual.clientesRestantes;
+        }
     }
 
     // Imprimindo rotas
@@ -1501,13 +1541,13 @@ void Grafo::gulosoRandomizadoCVRP(double alpha)
     for (int i = 0; i < this->numVeiculos; i++)
     {
         cout << "Rota #" << i+1 << ": ";
-        for (No *client:rotas[i].clientes)
+        for (No *client:bestSolution.rotas[i].clientes)
         {
             cout << client->getIdNo() << " ";
         }
         cout << endl;
-        double routeDistance = this->calculaDistanciaRota(rotas[i].clientes);
-        custoTotal += routeDistance;
     }
-    cout << "Custo total: " << custoTotal << endl;
+    cout << "Custo total: " << bestSolution.cost << endl << endl;
+
+    return bestSolution;
 }

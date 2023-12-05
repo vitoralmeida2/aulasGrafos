@@ -107,20 +107,37 @@ void leDemandas(Grafo *grafo, string nomeArquivo)
     arq.close();
 }
 
+bool verificaSolution(Solution sol)
+{
+    if (sol.clientesRestantes.size() == 1) // Se tiver apenas o deposito nos clientes restantes, solucao valida!
+    {
+        cout << "Solucao valida, todos clientes atendidos!" << endl;
+        cout << "Custo total da solucao: " << sol.cost;
+        return true;
+    } else
+        {
+            cout << "Solucao invalida!" << endl;
+            return false;
+        }
+}
+
 int main(int argc, const char* argv[])
 {
     string nomeArquivo = "instancias/modeloInstancia.txt";
     Grafo *grafo;
+    Solution guloso, randomizado;
     grafo = criaGrafoLeInstancia(nomeArquivo);
     leDemandas(grafo, nomeArquivo);
-    double alpha = 0.3;
+    double alpha = 0.8;
 
     cout << " --- Guloso --- " << endl << endl;
-    grafo->gulosoCVRP();
+    guloso = grafo->gulosoCVRP();
+    verificaSolution(guloso);
     cout << endl << endl;
 
     cout << " --- Guloso Randomizado --- " << endl << endl;
-    grafo->gulosoRandomizadoCVRP(alpha);
+    randomizado = grafo->gulosoRandomizadoCVRP(alpha);
+    verificaSolution(randomizado);
     cout << endl << endl;
 
     system("pause");

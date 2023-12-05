@@ -9,6 +9,8 @@
 #include <queue>
 #include <limits>
 #include <algorithm>
+#include <random>
+#include <chrono>
 #include "No.h"
 #include "Aresta.h"
 
@@ -25,6 +27,14 @@ struct Rota
 {
     vector<No*> clientes;
     int capacityUsed;
+    double custo;
+};
+
+struct Solution
+{
+    vector<Rota> rotas;
+    double cost;
+    vector<No*> clientesRestantes;
 };
 
 class Grafo 
@@ -97,11 +107,11 @@ class Grafo
         vector<No*> getNos();
         double distance(No *a, No *b);
         int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
-        void gulosoCVRP();
-        void gulosoRandomizadoCVRP(double alpha);
+        Solution gulosoCVRP();
+        Solution gulosoRandomizadoCVRP(double alpha);
         double calculaDistanciaRota(vector<No*> rota);
+        double calculateSolutionCost(Solution &sol);
         int encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
-
         void setNosNaoVisitados(vector<No*> clientes);
     
     private:

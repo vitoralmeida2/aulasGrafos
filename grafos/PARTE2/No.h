@@ -43,6 +43,11 @@ class No
         int getCordX();
         int getCordY();
 
+        bool operator == (const No& no) const 
+        {
+            return idNo == no.idNo;
+        }
+
     private:
         int idNo;
         int cordX, cordY;
