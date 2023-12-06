@@ -1362,7 +1362,7 @@ int Grafo::encontraClienteProximo(No *clienteAtual, vector<No*> clientes)
     return clienteProximo;
 }
 
-int Grafo::encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha)
+int Grafo::encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha)
 {
     vector<int> indicesNaoVisitados;
 
@@ -1481,7 +1481,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (int exec = 0; exec < 100; exec++) // numero de execucoes do algoritmo
+    for (int exec = 0; exec < 5000; exec++) // numero de execucoes do algoritmo
     {
         Solution solAtual;
         vector<No*> clientesRestante = clientes;
@@ -1500,7 +1500,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
             while (true)
             {
                 // Escolhendo aleatoriamente um cliente proximo nao visitado
-                int randomClienteIndice = encontraClienteProxAleatorio(clientesRestante, rotaTemp.clientes.back() ,alpha);
+                int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
 
                 if (randomClienteIndice == -1)
                     break; // nao ha clientes nao visitados
@@ -1528,7 +1528,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
         solAtual.clientesRestantes = clientesRestante;
         solAtual.cost = calculateSolutionCost(solAtual);
 
-        if (solAtual.cost < bestSolution.cost)
+        if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
         {
             bestSolution.cost = solAtual.cost;
             bestSolution.rotas = solAtual.rotas;

@@ -37,6 +37,12 @@ struct Solution
     vector<No*> clientesRestantes;
 };
 
+struct AlfaHistorico
+{
+    double alpha;
+    double solucaoQualidade;
+};
+
 class Grafo 
 {
     public:
@@ -111,7 +117,7 @@ class Grafo
         Solution gulosoRandomizadoCVRP(double alpha);
         double calculaDistanciaRota(vector<No*> rota);
         double calculateSolutionCost(Solution &sol);
-        int encontraClienteProxAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
+        int encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
         void setNosNaoVisitados(vector<No*> clientes);
     
     private:
