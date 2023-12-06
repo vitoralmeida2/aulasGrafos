@@ -35,12 +35,7 @@ struct Solution
     vector<Rota> rotas;
     double cost;
     vector<No*> clientesRestantes;
-};
-
-struct AlfaHistorico
-{
-    double alpha;
-    double solucaoQualidade;
+    double bestAlfa;
 };
 
 class Grafo 
@@ -115,6 +110,7 @@ class Grafo
         int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
         Solution gulosoCVRP();
         Solution gulosoRandomizadoCVRP(double alpha);
+        Solution gulosoRandomizadoReativoCVRP(vector<double> alfas);
         double calculaDistanciaRota(vector<No*> rota);
         double calculateSolutionCost(Solution &sol);
         int encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);

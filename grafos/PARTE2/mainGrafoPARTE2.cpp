@@ -53,14 +53,7 @@ Grafo *criaGrafoLeInstancia(string nomeArquivo)
                         {
                             grafo->insereNo(id, x, y, 0);
                         }
-                    } else if (linha.find("DEMAND_SECTION") != string::npos)
-                        {
-                            cout << "teste";
-                            while (arq >> id >> demand)
-                            {
-                                grafo->atualizaPesoNos(id, demand);
-                            }
-                        }
+                    }
     }
 
     grafo->setCapacidade(capacity);
@@ -117,6 +110,12 @@ bool verificaSolution(Solution sol)
     } else
         {
             cout << "Solucao invalida!" << endl;
+            cout << "Clientes nao visitados: " << endl;
+            for (No *cl:sol.clientesRestantes)
+            {
+                cout << cl->getIdNo() << " ";
+            }
+            cout << endl;
             return false;
         }
 }
@@ -141,10 +140,10 @@ int main(int argc, const char* argv[])
     verificaSolution(randomizado);
     cout << endl << endl;
 
-    // cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
-    // reativo = grafo->gulosoRandomizadoReativoCVRP(alfas);
-    // verificaSolution(reativo);
-    // cout << endl << endl;
+    cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
+    reativo = grafo->gulosoRandomizadoReativoCVRP(alfas);
+    verificaSolution(reativo);
+    cout << endl << endl;
 
     system("pause");
     delete grafo;

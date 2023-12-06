@@ -1481,7 +1481,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (int exec = 0; exec < 5000; exec++) // numero de execucoes do algoritmo
+    for (int exec = 0; exec < 2000; exec++) // numero de execucoes do algoritmo
     {
         Solution solAtual;
         vector<No*> clientesRestante = clientes;
@@ -1548,6 +1548,88 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
         cout << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl << endl;
+
+    return bestSolution;
+}
+
+Solution Grafo::gulosoRandomizadoReativoCVRP(vector<double> alfas)
+{
+    Solution bestSolution;
+    bestSolution.cost = INFINITO;
+    vector<No*> clientes = this->getNos();
+
+    for (double alpha:alfas)
+    {
+        for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
+        {
+            Solution solAtual;
+            vector<No*> clientesRestante = clientes;
+            setNosNaoVisitados(clientesRestante);
+            vector<Rota> rotas(this->getVeiculos());
+
+            for (int i = 0; i < this->getVeiculos(); i++)
+            {
+                Rota &rotaTemp = rotas[i];
+                rotaTemp.capacityUsed = 0;
+
+                // Iniciando no deposito
+                rotaTemp.clientes.push_back(clientesRestante[0]);
+                clientesRestante[0]->setVisitado(true);
+
+                while (true)
+                {
+                    // Escolhendo aleatoriamente um cliente proximo nao visitado
+                    int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
+
+                    if (randomClienteIndice == -1)
+                        break; // nao ha clientes nao visitados
+
+                    No *clientProx = clientesRestante[randomClienteIndice];
+
+                    // testando capacidade
+                    if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+                    {
+                        rotaTemp.capacityUsed += clientProx->getPeso();
+                        rotaTemp.clientes.push_back(clientProx);
+                        clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
+                        clientProx->setVisitado(true);
+                    } else
+                        {
+                            break; // rota cheia passa pro proximo veiculo
+                        }
+                }
+                // adicionando retorno ao deposito
+                rotaTemp.clientes.push_back(clientes[0]);
+            }
+
+            // comparando solucao atual com a melhor solucao
+            solAtual.rotas = rotas;
+            solAtual.clientesRestantes = clientesRestante;
+            solAtual.cost = calculateSolutionCost(solAtual);
+
+            if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
+            {
+                bestSolution.cost = solAtual.cost;
+                bestSolution.rotas = solAtual.rotas;
+                bestSolution.clientesRestantes = solAtual.clientesRestantes;
+                bestSolution.bestAlfa = alpha;
+            }
+        }
+    }
+
+    // Imprimindo rotas
+    cout << "Instancia: " << this->getInstanceName() << endl;
+    for (int i = 0; i < this->numVeiculos; i++)
+    {
+        cout << "Rota #" << i+1 << ": ";
+        for (No *client:bestSolution.rotas[i].clientes)
+        {
+            cout << client->getIdNo() << " ";
+        }
+        cout << endl;
+    }
+    cout << "Custo total: " << bestSolution.cost << endl;
+    cout << "Melhor aplha: " << bestSolution.bestAlfa << endl;
 
     return bestSolution;
 }
