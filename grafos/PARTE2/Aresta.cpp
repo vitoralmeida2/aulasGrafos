@@ -3,8 +3,6 @@
 #include <string>
 #include "Aresta.h"
 
-using namespace std;
-
 // --- CONSTRUTOR E DESTRUTOR ---
 
 Aresta::Aresta(No *NoOrig, No *NoDest, int pesoArest, Aresta *proxArest)

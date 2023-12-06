@@ -1,10 +1,8 @@
 #include "No.h"
 
-using namespace std;
-
 // --- CONSTRUTOR E DESTRUTOR ---
 
-No::No(int name, int x, int y, int peso) 
+No::No(int name, float x, float y, int peso) 
 {
     this->idNo = name;
     this->cordX = x;
@@ -123,12 +121,12 @@ Aresta *No::getPrimeiraAresta()
     return this->primeiraAresta;
 }
 
-int No::getCordX()
+float No::getCordX()
 {
     return this->cordX;
 }
 
-int No::getCordY()
+float No::getCordY()
 {
     return this->cordY;
 }

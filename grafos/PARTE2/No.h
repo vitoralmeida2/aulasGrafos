@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "Aresta.h"
 
-using namespace std;
-
 class Aresta;
 
 
@@ -14,7 +12,7 @@ class Aresta;
 class No 
 {
     public:
-        No(int idNo, int cordX, int cordY, int peso);
+        No(int idNo, float cordX, float cordY, int peso);
         ~No();
         
         // --- SET ---
@@ -40,8 +38,8 @@ class No
         Aresta *getPrimeiraAresta();
         bool getVisitado();
 
-        int getCordX();
-        int getCordY();
+        float getCordX();
+        float getCordY();
 
         bool operator == (const No& no) const 
         {
@@ -50,7 +48,7 @@ class No
 
     private:
         int idNo;
-        int cordX, cordY;
+        float cordX, cordY;
         int pesoNo;
         bool visitado;
         int grauEntrada;

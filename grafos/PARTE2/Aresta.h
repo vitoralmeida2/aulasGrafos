@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "No.h"
 
-using namespace std;
-
 class No;
 
 // --- Definindo class Aresta ---

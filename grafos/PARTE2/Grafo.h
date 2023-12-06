@@ -51,7 +51,7 @@ class Grafo
 
         // --- Funcoes do No ---
         No *procurarNoPeloId(int idFindNo);
-        No *insereNo(int idNo, int x, int y, int pesoNo);
+        No *insereNo(int idNo, float x, float y, int pesoNo);
         bool removeNo(int idNo);
 
         // --- Funcoes de Aresta ---
@@ -115,6 +115,9 @@ class Grafo
         double calculateSolutionCost(Solution &sol);
         int encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
         void setNosNaoVisitados(vector<No*> clientes);
+        Solution guloso();
+        Solution randomizado(double apha);
+        Solution reativo(vector<double> alfas);
     
     private:
         int ordem;
