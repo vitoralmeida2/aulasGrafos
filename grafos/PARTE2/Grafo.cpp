@@ -1470,7 +1470,6 @@ Solution Grafo::gulosoCVRP(ofstream& arquivo)
     cout << "Custo total: " << sol.cost << endl << endl;
     if (arquivo.is_open()) { 
         arquivo << "Custo total: " << sol.cost << endl;
-        arquivo << "" << endl;
     }
     return sol;
 }
@@ -1565,7 +1564,6 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
     }
     if (arquivo.is_open()) { 
         arquivo << "Custo total: " << bestSolution.cost << endl;
-        arquivo << "" << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl << endl;
 
@@ -1714,7 +1712,6 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
     if (arquivo.is_open()) { 
         arquivo << "Custo total: " << bestSolution.cost << endl;
         arquivo << "Melhor alpha: " << bestSolution.bestAlfa << endl;
-        arquivo << "" << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl;
     cout << "Melhor aplha: " << bestSolution.bestAlfa << endl;

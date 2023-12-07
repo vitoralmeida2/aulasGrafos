@@ -235,7 +235,6 @@ bool verificaSolution(Solution sol)
 
 int main(int argc, const char* argv[])
 {
-    string nomeArquivo = "instancias/A-n34-k5.txt";
     Grafo *grafo;
     Solution guloso, randomizado, reativo;
     double alpha = 0.3;
@@ -258,7 +257,6 @@ int main(int argc, const char* argv[])
     if ((dir = opendir(pastaInstancias.c_str())) != nullptr) {
         while ((ent = readdir(dir)) != nullptr) {
             if (ent->d_type == DT_REG) {  // Verifica se é um arquivo regular
-                //cout << "Nome do arquivo: " << ent->d_name << endl;
                 vetorInstancias.push_back(ent->d_name);
                 numInstancias++;
             }
@@ -291,29 +289,47 @@ int main(int argc, const char* argv[])
         if (arquivo.is_open()) { // Verifica se o arquivo foi aberto com sucesso
             arquivo << "RELATORIO FINAL COM AS ROTA DO GULOSO, RANDOMIZADO E REATIVO COM O TEMPO DE COMPILAÇÃO: " << endl;
             
+            auto start = chrono::high_resolution_clock::now();
             cout << " --- Guloso --- " << endl << endl;
             cout << endl << endl;
             guloso = grafo->gulosoCVRP(arquivo);
             verificaSolution(guloso);
 
+            auto stop = chrono::high_resolution_clock::now();
+            auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+
+            cout << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
+            arquivo << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
             arquivo << endl; 
             arquivo << endl;
             arquivo << endl;
 
-            for(int i=0; i<alfas.size(); i++) {
+            for(int i=0; i<alfas.size(); i++) { 
+                start = chrono::high_resolution_clock::now();
                 cout << " --- Guloso Randomizado --- " << endl << endl;
                 randomizado = grafo->gulosoRandomizadoCVRP(alfas[i], arquivo); 
                 verificaSolution(randomizado);
                 cout << endl << endl;
 
+                stop = chrono::high_resolution_clock::now();
+                duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+
+                cout << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
+                arquivo << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
                 arquivo << endl; 
                 arquivo << endl;
                 arquivo << endl;
             } 
 
+            start = chrono::high_resolution_clock::now();
             cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
             reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa, arquivo);
             verificaSolution(reativo);
+            stop = chrono::high_resolution_clock::now();
+            duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+
+            cout << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
+            arquivo << "Tempo decorrido: " << duration.count() << " milisegundos " << endl;
             cout << endl << endl;
             
             arquivo.close(); // Fecha o arquivo quando terminar a interação
