@@ -108,8 +108,8 @@ class Grafo
         vector<No*> getNos();
         double distance(No *a, No *b);
         int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
-        Solution gulosoCVRP();
-        Solution gulosoRandomizadoCVRP(double alpha);
+        Solution gulosoCVRP(ofstream& arquivo);
+        Solution gulosoRandomizadoCVRP(double alpha, ofstream& arquivo);
         Solution gulosoRandomizadoReativoCVRP(vector<double> alfas);
         double calculaDistanciaRota(vector<No*> rota);
         double calculateSolutionCost(Solution &sol);

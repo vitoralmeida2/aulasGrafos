@@ -17,6 +17,7 @@
 #include "Aresta.h"
 #include "No.h"
 #define INFINITO INT32_MAX
+#include <fstream>
 
 // --- Construtor ---
 
@@ -1415,7 +1416,7 @@ int Grafo::encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clien
 
 }
 
-Solution Grafo::gulosoCVRP()
+Solution Grafo::gulosoCVRP(ofstream& arquivo)
 {
     Solution sol;
     sol.cost = 0.0;
@@ -1460,22 +1461,42 @@ Solution Grafo::gulosoCVRP()
     sol.cost = calculateSolutionCost(sol);
 
     // Imprimindo rotas
+    //arquivo.open("main.cpp", ios::app);
     cout << "Instancia: " << this->getInstanceName() << endl;
+    if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS         Guloso   " << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (int i = 0; i < this->numVeiculos; i++)
     {
         cout << "Rota #" << i+1 << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << i+1 << ": ";
+        }
         for (No *client:sol.rotas[i].clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        } 
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cout << endl;
     }
     cout << "Custo total: " << sol.cost << endl << endl;
-
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << sol.cost << endl;
+        arquivo << "" << endl;
+    }
     return sol;
 }
 
-Solution Grafo::gulosoRandomizadoCVRP(double alpha)
+Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
@@ -1538,14 +1559,34 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha)
 
     // Imprimindo rotas
     cout << "Instancia: " << this->getInstanceName() << endl;
+    if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS         Randomizado Alfa -    " <<  alpha << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (int i = 0; i < this->numVeiculos; i++)
     {
         cout << "Rota #" << i+1 << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << i+1 << ": ";
+        }
         for (No *client:bestSolution.rotas[i].clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        }
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cout << endl;
+    }
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << bestSolution.cost << endl;
+        arquivo << "" << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl << endl;
 

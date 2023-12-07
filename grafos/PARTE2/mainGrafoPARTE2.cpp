@@ -6,6 +6,8 @@
 #include <dirent.h>
 #include "Grafo.h"
 #define INFINITO INT32_MAX
+#include <dirent.h>
+#include <chrono>
 
 using namespace std;
 
@@ -233,40 +235,91 @@ bool verificaSolution(Solution sol)
 
 int main(int argc, const char* argv[])
 {
-    string nomeArquivo = "instancias/modeloInstancia.txt";
+    string nomeArquivo = "instancias/A-n34-k5.txt";
     Grafo *grafo;
     Solution guloso, randomizado, reativo;
     double alpha = 0.3;
-    vector<double> alfas = {0.05, 0.10, 0.15, 0.30, 0.50};
+    vector<double> alfas = {0.05, 0.10, 0.15, 0.30, 0.50}; 
 
-    grafo = readFile3(nomeArquivo);
-    demandasReadFile(grafo, nomeArquivo);
-
-    guloso = grafo->guloso();
-    verificaSolution(guloso);
+    vector<string> vetorInstancias;
+    string pastaInstancias = "./instancias";
+    int numInstancias = 0;
+    DIR *dir;
+    struct dirent *ent;
     
-    randomizado = grafo->randomizado(alpha);
-    verificaSolution(randomizado);
+    if ((dir = opendir(pastaInstancias.c_str())) != nullptr) {
+        while ((ent = readdir(dir)) != nullptr) {
+            if (ent->d_type == DT_REG) {  // Verifica se é um arquivo regular
+                //cout << "Nome do arquivo: " << ent->d_name << endl;
+                vetorInstancias.push_back(ent->d_name);
+                numInstancias++;
+            }
+        }
+        closedir(dir);
+    } else {
+        cerr << "Erro ao abrir a pasta." << endl;
+        return 1;
+    }
 
-    reativo = grafo->reativo(alfas);
-    verificaSolution(reativo);
+    for(int i=0; i<numInstancias; i++) {
+        ofstream arquivo(vetorInstancias[i],ios::app); // Abre o arquivo em modo de adição (append)
 
-    // cout << " --- Guloso --- " << endl << endl;
-    // guloso = grafo->gulosoCVRP();
+         if(vetorInstancias[i][0] == 'X') {  
+            grafo = readFile2(pastaInstancias + "/" + vetorInstancias[i]);
+        } else if(vetorInstancias[i][0] == 'G') { 
+            grafo = readFile3(pastaInstancias + "/" + vetorInstancias[i]);
+        } else { 
+            grafo = readFile(pastaInstancias + "/" + vetorInstancias[i]);
+        }
+        
+        demandasReadFile(grafo, vetorInstancias[i]);
+
+        if (arquivo.is_open()) { // Verifica se o arquivo foi aberto com sucesso
+            arquivo << "RELATORIO FINAL COM AS ROTA DO GULOSO, RANDOMIZADO E REATIVO COM O TEMPO DE COMPILAÇÃO: " << endl;
+            
+            cout << " --- Guloso --- " << endl << endl;
+            cout << endl << endl;
+            guloso = grafo->gulosoCVRP(arquivo);
+            verificaSolution(guloso);
+
+            arquivo << endl; 
+            arquivo << endl;
+            arquivo << endl;
+
+            for(int i=0; i<alfas.size(); i++) {
+                cout << " --- Guloso Randomizado --- " << endl << endl;
+                randomizado = grafo->gulosoRandomizadoCVRP(alfas[i], arquivo); 
+                verificaSolution(randomizado);
+                cout << endl << endl;
+
+                arquivo << endl; 
+                arquivo << endl;
+                arquivo << endl;
+            }
+            
+            arquivo.close(); // Fecha o arquivo quando terminar a interação
+        } else {
+        cerr << "Erro ao abrir o arquivo!" <<endl;
+        return 1;
+        }
+    }
+
+    // guloso = grafo->guloso();
     // verificaSolution(guloso);
-    // cout << endl << endl;
-
-    // cout << " --- Guloso Randomizado --- " << endl << endl;
-    // randomizado = grafo->gulosoRandomizadoCVRP(alpha);
+    
+    // randomizado = grafo->randomizado(alpha);
     // verificaSolution(randomizado);
-    // cout << endl << endl;
+
+    // reativo = grafo->reativo(alfas);
+    // verificaSolution(reativo);
+
+    
 
     // cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
     // reativo = grafo->gulosoRandomizadoReativoCVRP(alfas);
     // verificaSolution(reativo);
     // cout << endl << endl;
 
-    system("pause");
     delete grafo;
     return 0;
 }
