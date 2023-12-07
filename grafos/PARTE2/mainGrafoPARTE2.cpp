@@ -5,9 +5,8 @@
 #include <time.h>
 #include <dirent.h>
 #include "Grafo.h"
-#define INFINITO INT32_MAX
-#include <dirent.h>
 #include <chrono>
+#define INFINITO INT32_MAX
 
 using namespace std;
 
@@ -292,8 +291,27 @@ int main(int argc, const char* argv[])
             auto start = chrono::high_resolution_clock::now();
             cout << " --- Guloso --- " << endl << endl;
             cout << endl << endl;
-            guloso = grafo->gulosoCVRP(arquivo);
-            verificaSolution(guloso);
+            if (grafo->getVeiculos() == 0)
+            {
+                guloso = grafo->guloso(arquivo);
+            } else {
+                guloso = grafo->gulosoCVRP(arquivo);
+            }
+            if (verificaSolution(guloso))
+            {
+                arquivo << endl;
+                arquivo << "Solucao valida, todos clientes atendidos!" << endl;
+                arquivo << "Custo total da solucao: " << guloso.cost << endl << endl;
+            } else {
+                arquivo << endl;
+                arquivo << "Solucao invalida!" << endl;
+                arquivo << "Clientes nao visitados: " << endl;
+                for (No *cl:guloso.clientesRestantes)
+                {
+                    arquivo << cl->getIdNo() << " ";
+                }
+                arquivo << endl;
+            }
 
             auto stop = chrono::high_resolution_clock::now();
             auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
@@ -307,8 +325,27 @@ int main(int argc, const char* argv[])
             for(int i=0; i<alfas.size(); i++) { 
                 start = chrono::high_resolution_clock::now();
                 cout << " --- Guloso Randomizado --- " << endl << endl;
-                randomizado = grafo->gulosoRandomizadoCVRP(alfas[i], arquivo); 
-                verificaSolution(randomizado);
+                if (grafo->getVeiculos() == 0)
+                {
+                    randomizado = grafo->randomizado(alfas[i], arquivo);
+                } else {
+                    randomizado = grafo->gulosoRandomizadoCVRP(alfas[i], arquivo); 
+                }
+                if (verificaSolution(randomizado))
+                {
+                    arquivo << endl;
+                    arquivo << "Solucao valida, todos clientes atendidos!" << endl;
+                    arquivo << "Custo total da solucao: " << randomizado.cost << endl << endl;
+                } else {
+                    arquivo << endl;
+                    arquivo << "Solucao invalida!" << endl;
+                    arquivo << "Clientes nao visitados: " << endl;
+                    for (No *cl:guloso.clientesRestantes)
+                    {
+                        arquivo << cl->getIdNo() << " ";
+                    }
+                    arquivo << endl;
+                }
                 cout << endl << endl;
 
                 stop = chrono::high_resolution_clock::now();
@@ -323,8 +360,27 @@ int main(int argc, const char* argv[])
 
             start = chrono::high_resolution_clock::now();
             cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
-            reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa, arquivo);
-            verificaSolution(reativo);
+            if (grafo->getVeiculos() == 0)
+            {
+                reativo = grafo->reativo(probailidadesAlfa, arquivo);
+            } else {
+                reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa, arquivo);
+            }
+            if (verificaSolution(reativo))
+            {
+                arquivo << endl;
+                arquivo << "Solucao valida, todos clientes atendidos!" << endl;
+                arquivo << "Custo total da solucao: " << reativo.cost << endl << endl;
+            } else {
+                arquivo << endl;
+                arquivo << "Solucao invalida!" << endl;
+                arquivo << "Clientes nao visitados: " << endl;
+                for (No *cl:guloso.clientesRestantes)
+                {
+                    arquivo << cl->getIdNo() << " ";
+                }
+                arquivo << endl;
+            }
             stop = chrono::high_resolution_clock::now();
             duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
 
@@ -339,6 +395,10 @@ int main(int argc, const char* argv[])
         }
     }
 
+    for (auto prob:probailidadesAlfa)
+    {
+        delete [] prob;
+    }
     delete grafo;
     return 0;
 }

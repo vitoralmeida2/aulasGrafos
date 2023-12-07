@@ -120,11 +120,9 @@ class Grafo
         double calculateSolutionCost(Solution &sol);
         No* encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha, int capacidadeUsada);
         void setNosNaoVisitados(vector<No*> clientes);
-        Solution guloso();
-        Solution randomizado(double apha);
-        Solution reativo(vector<double> alfas);
-
-        Solution gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas);
+        Solution guloso(ofstream& arquivo);
+        Solution randomizado(double alpha, ofstream& arquivo);
+        Solution reativo(vector<Probabilidade*> alfas, ofstream& arquivo);
         void atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida);
         void normalizarProbabilidades(vector<Probabilidade*> probabilidades);
         Probabilidade* escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeAlfa);

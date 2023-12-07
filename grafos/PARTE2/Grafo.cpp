@@ -1719,7 +1719,7 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
     return bestSolution;
 }
 
-Solution Grafo::guloso() // Sem quantidade de veiculos, minimo de rotas necessarias
+Solution Grafo::guloso(ofstream& arquivo) // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution sol;
     sol.cost = 0.0;
@@ -1765,24 +1765,43 @@ Solution Grafo::guloso() // Sem quantidade de veiculos, minimo de rotas necessar
     sol.cost = calculateSolutionCost(sol);
 
     // Imprimindo rotas
+    //arquivo.open("main.cpp", ios::app);
     int cont = 1;
     cout << "Instancia: " << this->getInstanceName() << endl;
+    if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS         Guloso   " << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (auto route:sol.rotas)
     {
         cout << "Rota #" << cont << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << cont << ": ";
+        }
         for (No *client:route.clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        } 
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cont++;
         cout << endl;
     }
     cout << "Custo total: " << sol.cost << endl << endl;
-
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << sol.cost << endl;
+    }
     return sol;
 }
 
-Solution Grafo::randomizado(double alpha) // Sem quantidade de veiculos, minimo de rotas necessarias
+Solution Grafo::randomizado(double alpha, ofstream& arquivo) // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
@@ -1847,99 +1866,139 @@ Solution Grafo::randomizado(double alpha) // Sem quantidade de veiculos, minimo 
     // Imprimindo rotas
     int cont = 1;
     cout << "Instancia: " << this->getInstanceName() << endl;
+    if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS         Guloso Randomizado Alfa    " <<  alpha << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (auto route:bestSolution.rotas)
     {
         cout << "Rota #" << cont << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << cont << ": ";
+        }
         for (No *client:route.clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        }
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cont++;
         cout << endl;
+    }
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << bestSolution.cost << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl << endl;
 
     return bestSolution;
 }
 
-Solution Grafo::reativo(vector<double> alfas) // Sem quantidade de veiculos, minimo de rotas necessarias
+Solution Grafo::reativo(vector<Probabilidade*> alfas, ofstream& arquivo) // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (double alpha:alfas)
+    for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
     {
-        for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
+        Solution solAtual;
+        vector<No*> clientesRestante = clientes;
+        setNosNaoVisitados(clientesRestante);
+        vector<Rota> rotas(this->getVeiculos());
+        Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
+
+        while (clientesRestante.size() > 1)
         {
-            Solution solAtual;
-            vector<No*> clientesRestante = clientes;
-            setNosNaoVisitados(clientesRestante);
-            vector<Rota> rotas(this->getVeiculos());
+            Rota rotaTemp;
+            rotaTemp.capacityUsed = 0;
 
-            while (clientesRestante.size() > 1)
+            // Iniciando no deposito
+            rotaTemp.clientes.push_back(clientesRestante[0]);
+            clientesRestante[0]->setVisitado(true);
+
+            while (rotaTemp.capacityUsed <= this->getCapacidade())
             {
-                Rota rotaTemp;
-                rotaTemp.capacityUsed = 0;
+                // Escolhendo aleatoriamente um cliente proximo nao visitado
+                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
 
-                // Iniciando no deposito
-                rotaTemp.clientes.push_back(clientesRestante[0]);
-                clientesRestante[0]->setVisitado(true);
+                if (randomClient == NULL)
+                    break; // nao ha clientes nao visitados
 
-                while (rotaTemp.capacityUsed <= this->getCapacidade())
+                // testando capacidade
+                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                 {
-                    // Escolhendo aleatoriamente um cliente proximo nao visitado
-                    No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha, rotaTemp.capacityUsed);
-
-                    if (randomClient == NULL)
-                        break; // nao ha clientes nao visitados
-
-                    // testando capacidade
-                    if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
+                    rotaTemp.capacityUsed += randomClient->getPeso();
+                    rotaTemp.clientes.push_back(randomClient);
+                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                        return no->getIdNo() == randomClient->getIdNo();
+                    }), clientesRestante.end());
+                    randomClient->setVisitado(true);
+                } else
                     {
-                        rotaTemp.capacityUsed += randomClient->getPeso();
-                        rotaTemp.clientes.push_back(randomClient);
-                        clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
-                            return no->getIdNo() == randomClient->getIdNo();
-                        }), clientesRestante.end());
-                        randomClient->setVisitado(true);
-                    } else
-                        {
-                            break; // rota cheia passa pro proximo veiculo
-                        }
-                }
-                // adicionando retorno ao deposito
-                rotaTemp.clientes.push_back(clientes[0]);
-                rotas.push_back(rotaTemp);
+                        break; // rota cheia passa pro proximo veiculo
+                    }
             }
+            // adicionando retorno ao deposito
+            rotaTemp.clientes.push_back(clientes[0]);
+            rotas.push_back(rotaTemp);
+        }
 
-            // comparando solucao atual com a melhor solucao
-            solAtual.rotas = rotas;
-            solAtual.clientesRestantes = clientesRestante;
-            solAtual.cost = calculateSolutionCost(solAtual);
+        // comparando solucao atual com a melhor solucao
+        solAtual.rotas = rotas;
+        solAtual.clientesRestantes = clientesRestante;
+        solAtual.cost = calculateSolutionCost(solAtual);
 
-            if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
-            {
-                bestSolution.cost = solAtual.cost;
-                bestSolution.rotas = solAtual.rotas;
-                bestSolution.clientesRestantes = solAtual.clientesRestantes;
-                bestSolution.bestAlfa = alpha;
-            }
+        this->atualizarProbabilidade(alfaEscolhido, bestSolution.cost, solAtual.cost, solAtual.clientesRestantes.size() == 1);
+        normalizarProbabilidades(alfas);
+
+        if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
+        {
+            bestSolution.cost = solAtual.cost;
+            bestSolution.rotas = solAtual.rotas;
+            bestSolution.clientesRestantes = solAtual.clientesRestantes;
+            bestSolution.bestAlfa = alfaEscolhido->alfa;
         }
     }
 
     // Imprimindo rotas
     int cont = 1;
     cout << "Instancia: " << this->getInstanceName() << endl;
+     if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS        Guloso Randomizado Reativo    " << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (auto route:bestSolution.rotas)
     {
         cout << "Rota #" << cont << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << cont << ": ";
+        }
         for (No *client:route.clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        }
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cont++;
         cout << endl;
+    }
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << bestSolution.cost << endl;
+        arquivo << "Melhor alpha: " << bestSolution.bestAlfa << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl;
     cout << "Melhor aplha: " << bestSolution.bestAlfa << endl;
