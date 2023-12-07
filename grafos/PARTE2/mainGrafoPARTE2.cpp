@@ -285,20 +285,27 @@ int main(int argc, const char* argv[])
     Solution guloso, randomizado, reativo;
     double alpha = 0.3;
     vector<double> alfas = {0.05, 0.10, 0.15, 0.30, 0.50};
-    string nomeArquivo = "instancias/modeloInstancia.txt";
+    vector<Probabilidade*> probailidadesAlfa = {
+        new Probabilidade{0.05, 0.2},
+        new Probabilidade{0.10, 0.2},
+        new Probabilidade{0.15, 0.2},
+        new Probabilidade{0.30, 0.2},
+        new Probabilidade{0.5, 0.2}
+    };
+    string nomeArquivo = "instancias/B-n50-k8.txt";
     srand(time(NULL));
 
-    grafo = readFile3(nomeArquivo);
+    grafo = readFile(nomeArquivo);
     demandasReadFile(grafo, nomeArquivo);
 
-    guloso = grafo->guloso();
-    verificaSolution(guloso);
+    // guloso = grafo->guloso();
+    // verificaSolution(guloso);
     
-    randomizado = grafo->randomizado(alpha);
-    verificaSolution(randomizado);
+    // randomizado = grafo->randomizado(alpha);
+    // verificaSolution(randomizado);
 
-    reativo = grafo->reativo(alfas);
-    verificaSolution(reativo);
+    // reativo = grafo->reativo(alfas);
+    // verificaSolution(reativo);
 
     // cout << " --- Guloso --- " << endl << endl;
     // guloso = grafo->gulosoCVRP();
@@ -311,9 +318,9 @@ int main(int argc, const char* argv[])
     // cout << endl << endl;
 
     // cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
-    // reativo = grafo->gulosoRandomizadoReativoCVRP(alfas);
-    // verificaSolution(reativo);
-    // cout << endl << endl;
+    reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa);
+    verificaSolution(reativo);
+    cout << endl << endl;
 
     system("pause");
     delete grafo;

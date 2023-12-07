@@ -38,6 +38,11 @@ struct Solution
     double bestAlfa;
 };
 
+struct Probabilidade {
+    double alfa;
+    double probabilidade;
+};
+
 class Grafo 
 {
     public:
@@ -118,7 +123,12 @@ class Grafo
         Solution guloso();
         Solution randomizado(double apha);
         Solution reativo(vector<double> alfas);
-    
+
+        Solution gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas);
+        void atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida);
+        void normalizarProbabilidades(vector<Probabilidade*> probabilidades);
+        Probabilidade* escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeAlfa);
+        
     private:
         int ordem;
         int numNos;
