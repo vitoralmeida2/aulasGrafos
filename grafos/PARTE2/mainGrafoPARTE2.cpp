@@ -286,7 +286,7 @@ int main(int argc, const char* argv[])
             grafo = readFile(pastaInstancias + "/" + vetorInstancias[i]);
         }
         
-        demandasReadFile(grafo, vetorInstancias[i]);
+        demandasReadFile(grafo, pastaInstancias + "/" + vetorInstancias[i]);
 
         if (arquivo.is_open()) { // Verifica se o arquivo foi aberto com sucesso
             arquivo << "RELATORIO FINAL COM AS ROTA DO GULOSO, RANDOMIZADO E REATIVO COM O TEMPO DE COMPILAÇÃO: " << endl;

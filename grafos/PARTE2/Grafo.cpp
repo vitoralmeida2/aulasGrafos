@@ -1713,7 +1713,6 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
     }
     if (arquivo.is_open()) { 
         arquivo << "Custo total: " << bestSolution.cost << endl;
-        arquivo << "" << endl;
         arquivo << "Melhor alpha: " << bestSolution.bestAlfa << endl;
         arquivo << "" << endl;
     }
