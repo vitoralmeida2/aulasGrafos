@@ -12,7 +12,7 @@ using namespace std;
 Grafo *readFile(string nomeArquivo)
 {
     ifstream arq(nomeArquivo);
-    
+
     if (!arq.is_open())
     {
         cout << "Erro ao abrir o arquivo." << endl;
@@ -68,7 +68,7 @@ Grafo *readFile(string nomeArquivo)
     grafo->setInstanceName(instaceName);
     grafo->setCapacidade(capacity);
     grafo->setVeiculos(veiculos);
-    
+
     arq.close();
 
     return grafo;
@@ -77,7 +77,7 @@ Grafo *readFile(string nomeArquivo)
 void demandasReadFile(Grafo *grafo, string nomeArquivo)
 {
     ifstream arq(nomeArquivo);
-    
+
     if (!arq.is_open())
     {
         cout << "Erro ao abrir o arquivo." << endl;
@@ -233,11 +233,60 @@ bool verificaSolution(Solution sol)
 
 int main(int argc, const char* argv[])
 {
-    string nomeArquivo = "instancias/modeloInstancia.txt";
+    // vector<string> vetorInstancias;
+    // string pastaInstancias = "./instancias";
+    // int numInstancia = 0;
+    // DIR *dir;
+    // struct dirent *ent;
+
+    // auto start = chrono::high_resolution_clock::now(); // Comeca contar tempo a partir daqui
+
+    // if ((dir = opendir(pastaInstancias.c_str())) != nullptr)
+    // {
+    //     while ((ent = readdir(dir)) != nullptr)
+    //     {
+    //         if (ent->d_type == DT_REG) // Verifica se e um arquivo regular
+    //         {
+    //             vetorInstancias.push_back(ent->d_name);
+    //             numInstancia++;
+    //         }
+    //     }
+    //     closedir(dir);
+    // } else
+    //     {
+    //         cout << "Erro ao abrir a pasta." << endl;
+    //         return 1;
+    //     }
+
+    // for (int i = 0; i < numInstancia; i++)
+    // {
+    //     Grafo *g;
+    //     if (vetorInstancias[i][0] == 'X')
+    //     {
+    //         cout << pastaInstancias + vetorInstancias[i] << endl;
+    //         g = readFile2(pastaInstancias + "/" + vetorInstancias[i]);
+    //     } else if (vetorInstancias[i][0] == 'G')
+    //         {
+    //             cout << pastaInstancias + vetorInstancias[i] << endl;
+    //             g = readFile3(pastaInstancias + "/" + vetorInstancias[i]);
+    //         } else
+    //             {
+    //                 cout << pastaInstancias + vetorInstancias[i] << endl;
+    //                 g = readFile(pastaInstancias + "/" + vetorInstancias[i]);
+    //             }
+    // }
+
+    // auto stop = chrono::high_resolution_clock::now();
+    // auto duration = chrono::duration_cast<chrono::microseconds>(stop - start);
+
+    // cout << "Tempo decorrido: " << duration.count() << endl;
+
     Grafo *grafo;
     Solution guloso, randomizado, reativo;
     double alpha = 0.3;
     vector<double> alfas = {0.05, 0.10, 0.15, 0.30, 0.50};
+    string nomeArquivo = "instancias/modeloInstancia.txt";
+    srand(time(NULL));
 
     grafo = readFile3(nomeArquivo);
     demandasReadFile(grafo, nomeArquivo);

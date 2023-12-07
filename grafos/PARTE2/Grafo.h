@@ -113,7 +113,7 @@ class Grafo
         Solution gulosoRandomizadoReativoCVRP(vector<double> alfas);
         double calculaDistanciaRota(vector<No*> rota);
         double calculateSolutionCost(Solution &sol);
-        int encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha);
+        No* encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha, int capacidadeUsada);
         void setNosNaoVisitados(vector<No*> clientes);
         Solution guloso();
         Solution randomizado(double apha);
