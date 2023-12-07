@@ -1363,57 +1363,36 @@ int Grafo::encontraClienteProximo(No *clienteAtual, vector<No*> clientes)
     return clienteProximo;
 }
 
-int Grafo::encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha)
+No* Grafo::encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha, int capacidadeUsada)
 {
-    vector<int> indicesNaoVisitados;
+    vector<No*> clientesNaoVisitados;
 
     for (int i = 0; i < clientesRestantes.size(); i++)
     {
-        if(!clientesRestantes[i]->getVisitado())
+        if(!clientesRestantes[i]->getVisitado() && (capacidadeUsada + clientesRestantes[i]->getPeso() <= this->getCapacidade()))
         {
-            indicesNaoVisitados.push_back(i);
+           clientesNaoVisitados.push_back(clientesRestantes[i]);
         }
     }
 
-    if (indicesNaoVisitados.empty())
+    if (clientesNaoVisitados.empty())
     {
-        return -1; // nao ha clientes nao visitados
+        return NULL; // nao ha clientes nao visitados
     }
 
-    // Escolhendo aleatoriamente indices de clientes nao visitados
-    unsigned seed = chrono::system_clock::now().time_since_epoch().count();
-    mt19937 gen(seed);
+    sort(clientesNaoVisitados.begin(), clientesNaoVisitados.end(), [this,clienteAtual](No* a, No* b) {
+        return distance(clienteAtual, a) < distance(clienteAtual, b);
+    });
 
-    int clienteIndex = -1;
-    
-    if (uniform_real_distribution<>(0, 1)(gen) < alpha && !indicesNaoVisitados.empty())
-    {
-        // Escolhe aleatoriamente um dos 5 clientes mais proximos
-        int numClientesProximos = min(5, static_cast<int>(indicesNaoVisitados.size()));
-        vector<pair<int, double>> clientesProximos;
+    // Calcula novo tamanho
+    size_t novoTamanho = static_cast<size_t>(alpha * clientesNaoVisitados.size());
 
-        for (int index:indicesNaoVisitados)
-        {
-            double dist = distance(clienteAtual, clientesRestantes[index]);
-            clientesProximos.push_back(make_pair(index, dist));
-        }
+    // Reajusta tamanho vector
+    clientesNaoVisitados.resize(novoTamanho);
 
-        // Ordena pelo criterio de proximidade
-        sort(clientesProximos.begin(), clientesProximos.end(), [](auto &a, auto &b) {
-            return a.second < b.second;
-        });
+    random_shuffle(clientesNaoVisitados.begin(), clientesNaoVisitados.end());
 
-        // Escolhe aleatoriamente um dos 5 clientes mais proximos
-        uniform_int_distribution<> randomDis(0, numClientesProximos - 1);
-        return clientesProximos[randomDis(gen)].first;
-        
-    } else
-        {
-            // escolhe aleatoriamente
-            uniform_int_distribution<> randomDis(0, indicesNaoVisitados.size() - 1);
-            return indicesNaoVisitados[randomDis(gen)];
-        }
-
+    return clientesNaoVisitados[0];
 }
 
 Solution Grafo::gulosoCVRP(ofstream& arquivo)
@@ -1502,7 +1481,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (int exec = 0; exec < 2000; exec++) // numero de execucoes do algoritmo
+    for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
     {
         Solution solAtual;
         vector<No*> clientesRestante = clientes;
@@ -1521,20 +1500,20 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
             while (true)
             {
                 // Escolhendo aleatoriamente um cliente proximo nao visitado
-                int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
+                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha, rotaTemp.capacityUsed);
 
-                if (randomClienteIndice == -1)
+                if (randomClient == NULL)
                     break; // nao ha clientes nao visitados
 
-                No *clientProx = clientesRestante[randomClienteIndice];
-
                 // testando capacidade
-                if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                 {
-                    rotaTemp.capacityUsed += clientProx->getPeso();
-                    rotaTemp.clientes.push_back(clientProx);
-                    clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
-                    clientProx->setVisitado(true);
+                    rotaTemp.capacityUsed += randomClient->getPeso();
+                    rotaTemp.clientes.push_back(randomClient);
+                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                        return no->getIdNo() == randomClient->getIdNo();
+                    }), clientesRestante.end());
+                    randomClient->setVisitado(true);
                 } else
                     {
                         break; // rota cheia passa pro proximo veiculo
@@ -1593,68 +1572,115 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
     return bestSolution;
 }
 
-Solution Grafo::gulosoRandomizadoReativoCVRP(vector<double> alfas)
+/* ===========================================================================================================================*/
+
+void Grafo::atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida) {
+    bool aumentaProb = false;
+    if(valida && (distanciaRota < (melhorDistanciaTotal + 20))) {
+        aumentaProb = true;
+    }
+
+    if(aumentaProb && (distanciaRota < melhorDistanciaTotal)) {
+        alfaAtual->probabilidade = alfaAtual->probabilidade * 1.3;
+    } else if (valida && aumentaProb) {
+        alfaAtual->probabilidade = alfaAtual->probabilidade * 1.1; // Aumenta a probabilidade em 10%
+    } else {
+        alfaAtual->probabilidade = alfaAtual->probabilidade * 0.9;  // Diminui a probabilidade em 10%
+    }
+}
+
+void Grafo::normalizarProbabilidades(vector<Probabilidade*> probabilidades) {
+    double soma = 0.0;
+
+    // Calcular a soma total das probabilidades
+    for (auto* prob : probabilidades) {
+        soma += prob->probabilidade;
+    }
+
+    // Normalizar as probabilidades
+    for (auto* prob : probabilidades) {
+        prob->probabilidade = prob->probabilidade / soma;
+    }
+}
+
+Probabilidade* Grafo::escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeAlfa) {
+    double numeroAleatorio = (double)rand() / RAND_MAX;
+    double acumulado = 0.0;
+
+    for (const auto& prob : probabilidadeAlfa) {
+        acumulado += prob->probabilidade;
+        if (numeroAleatorio <= acumulado) {
+            return prob;
+        }
+    }
+
+    return nullptr;
+}
+
+
+Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas) // Reativo com quantidade de veiculos
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (double alpha:alfas)
+    for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
     {
-        for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
+        Solution solAtual;
+        vector<No*> clientesRestante = clientes;
+        setNosNaoVisitados(clientesRestante);
+        vector<Rota> rotas(this->getVeiculos());
+        Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
+
+        for (int i = 0; i < this->getVeiculos(); i++)
         {
-            Solution solAtual;
-            vector<No*> clientesRestante = clientes;
-            setNosNaoVisitados(clientesRestante);
-            vector<Rota> rotas(this->getVeiculos());
+            Rota &rotaTemp = rotas[i];
+            rotaTemp.capacityUsed = 0;
 
-            for (int i = 0; i < this->getVeiculos(); i++)
+            // Iniciando no deposito
+            rotaTemp.clientes.push_back(clientesRestante[0]);
+            clientesRestante[0]->setVisitado(true);
+
+            while (true)
             {
-                Rota &rotaTemp = rotas[i];
-                rotaTemp.capacityUsed = 0;
+                // Escolhendo aleatoriamente um cliente proximo nao visitado
+                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
 
-                // Iniciando no deposito
-                rotaTemp.clientes.push_back(clientesRestante[0]);
-                clientesRestante[0]->setVisitado(true);
+                if (randomClient == NULL)
+                    break; // nao ha clientes nao visitados
 
-                while (true)
+                // testando capacidade
+                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                 {
-                    // Escolhendo aleatoriamente um cliente proximo nao visitado
-                    int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
-
-                    if (randomClienteIndice == -1)
-                        break; // nao ha clientes nao visitados
-
-                    No *clientProx = clientesRestante[randomClienteIndice];
-
-                    // testando capacidade
-                    if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+                    rotaTemp.capacityUsed += randomClient->getPeso();
+                    rotaTemp.clientes.push_back(randomClient);
+                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                        return no->getIdNo() == randomClient->getIdNo();
+                    }), clientesRestante.end());
+                    randomClient->setVisitado(true);
+                } else
                     {
-                        rotaTemp.capacityUsed += clientProx->getPeso();
-                        rotaTemp.clientes.push_back(clientProx);
-                        clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
-                        clientProx->setVisitado(true);
-                    } else
-                        {
-                            break; // rota cheia passa pro proximo veiculo
-                        }
-                }
-                // adicionando retorno ao deposito
-                rotaTemp.clientes.push_back(clientes[0]);
+                        break; // rota cheia passa pro proximo veiculo
+                    }
             }
+            // adicionando retorno ao deposito
+            rotaTemp.clientes.push_back(clientes[0]);
+        }
 
-            // comparando solucao atual com a melhor solucao
-            solAtual.rotas = rotas;
-            solAtual.clientesRestantes = clientesRestante;
-            solAtual.cost = calculateSolutionCost(solAtual);
+        // comparando solucao atual com a melhor solucao
+        solAtual.rotas = rotas;
+        solAtual.clientesRestantes = clientesRestante;
+        solAtual.cost = calculateSolutionCost(solAtual);
 
-            if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
-            {
-                bestSolution.cost = solAtual.cost;
-                bestSolution.rotas = solAtual.rotas;
-                bestSolution.clientesRestantes = solAtual.clientesRestantes;
-                bestSolution.bestAlfa = alpha;
-            }
+        this->atualizarProbabilidade(alfaEscolhido, bestSolution.cost, solAtual.cost, solAtual.clientesRestantes.size() == 1);
+        normalizarProbabilidades(alfas);
+
+        if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
+        {
+            bestSolution.cost = solAtual.cost;
+            bestSolution.rotas = solAtual.rotas;
+            bestSolution.clientesRestantes = solAtual.clientesRestantes;
+            bestSolution.bestAlfa = alfaEscolhido->alfa;
         }
     }
 
@@ -1675,7 +1701,7 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<double> alfas)
     return bestSolution;
 }
 
-Solution Grafo::guloso()
+Solution Grafo::guloso() // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution sol;
     sol.cost = 0.0;
@@ -1738,7 +1764,7 @@ Solution Grafo::guloso()
     return sol;
 }
 
-Solution Grafo::randomizado(double alpha)
+Solution Grafo::randomizado(double alpha) // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
@@ -1763,20 +1789,20 @@ Solution Grafo::randomizado(double alpha)
             while (rotaTemp.capacityUsed <= this->getCapacidade())
             {
                 // Escolhendo aleatoriamente um cliente proximo nao visitado
-                int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
+                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha, rotaTemp.capacityUsed);
 
-                if (randomClienteIndice == -1)
+                if (randomClient == NULL)
                     break; // nao ha clientes nao visitados
 
-                No *clientProx = clientesRestante[randomClienteIndice];
-
                 // testando capacidade
-                if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                 {
-                    rotaTemp.capacityUsed += clientProx->getPeso();
-                    rotaTemp.clientes.push_back(clientProx);
-                    clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
-                    clientProx->setVisitado(true);
+                    rotaTemp.capacityUsed += randomClient->getPeso();
+                    rotaTemp.clientes.push_back(randomClient);
+                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                        return no->getIdNo() == randomClient->getIdNo();
+                    }), clientesRestante.end());
+                    randomClient->setVisitado(true);
                 } else
                     {
                         break; // rota cheia passa pro proximo veiculo
@@ -1818,7 +1844,7 @@ Solution Grafo::randomizado(double alpha)
     return bestSolution;
 }
 
-Solution Grafo::reativo(vector<double> alfas)
+Solution Grafo::reativo(vector<double> alfas) // Sem quantidade de veiculos, minimo de rotas necessarias
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
@@ -1845,20 +1871,20 @@ Solution Grafo::reativo(vector<double> alfas)
                 while (rotaTemp.capacityUsed <= this->getCapacidade())
                 {
                     // Escolhendo aleatoriamente um cliente proximo nao visitado
-                    int randomClienteIndice = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha);
+                    No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alpha, rotaTemp.capacityUsed);
 
-                    if (randomClienteIndice == -1)
+                    if (randomClient == NULL)
                         break; // nao ha clientes nao visitados
 
-                    No *clientProx = clientesRestante[randomClienteIndice];
-
                     // testando capacidade
-                    if (rotaTemp.capacityUsed + clientProx->getPeso() <= this->getCapacidade())
+                    if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                     {
-                        rotaTemp.capacityUsed += clientProx->getPeso();
-                        rotaTemp.clientes.push_back(clientProx);
-                        clientesRestante.erase(clientesRestante.begin() + randomClienteIndice);
-                        clientProx->setVisitado(true);
+                        rotaTemp.capacityUsed += randomClient->getPeso();
+                        rotaTemp.clientes.push_back(randomClient);
+                        clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                            return no->getIdNo() == randomClient->getIdNo();
+                        }), clientesRestante.end());
+                        randomClient->setVisitado(true);
                     } else
                         {
                             break; // rota cheia passa pro proximo veiculo
