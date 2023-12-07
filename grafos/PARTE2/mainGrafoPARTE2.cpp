@@ -269,39 +269,23 @@ int main(int argc, const char* argv[])
         return 1;
     }
 
+    // for(int i=0; i<numInstancias; i++) { 
+    //     cout << vetorInstancias[i] << endl;
+    // }
+
     for(int i=0; i<numInstancias; i++) {
         ofstream arquivo(vetorInstancias[i],ios::app); // Abre o arquivo em modo de adição (append)
-        vector<string> vetorInstancias;
-        string pastaInstancias = "./instancias";
-        int numInstancia = 0;
-        DIR *dir;
-        struct dirent *ent;
 
         auto start = chrono::high_resolution_clock::now(); // Comeca contar tempo a partir daqui
-
-        if ((dir = opendir(pastaInstancias.c_str())) != nullptr) {
-            while ((ent = readdir(dir)) != nullptr) {
-                if (ent->d_type == DT_REG) // Verifica se e um arquivo regular
-                {
-                    vetorInstancias.push_back(ent->d_name);
-                    numInstancia++;
-                }
-            }
-            closedir(dir);
-        } else {
-            cout << "Erro ao abrir a pasta." << endl;
-            return 1;
+        
+        if(vetorInstancias[i][0] == 'X') {  
+            grafo = readFile2(pastaInstancias + "/" + vetorInstancias[i]);
+        } else if(vetorInstancias[i][0] == 'G') { 
+            grafo = readFile3(pastaInstancias + "/" + vetorInstancias[i]);
+        } else { 
+            grafo = readFile(pastaInstancias + "/" + vetorInstancias[i]);
         }
-
-        for (int i = 0; i < numInstancia; i++) {
-            if(vetorInstancias[i][0] == 'X') {  
-                grafo = readFile2(pastaInstancias + "/" + vetorInstancias[i]);
-            } else if(vetorInstancias[i][0] == 'G') { 
-                grafo = readFile3(pastaInstancias + "/" + vetorInstancias[i]);
-            } else { 
-                grafo = readFile(pastaInstancias + "/" + vetorInstancias[i]);
-            }
-        }
+        
         demandasReadFile(grafo, vetorInstancias[i]);
 
         if (arquivo.is_open()) { // Verifica se o arquivo foi aberto com sucesso
@@ -325,7 +309,12 @@ int main(int argc, const char* argv[])
                 arquivo << endl; 
                 arquivo << endl;
                 arquivo << endl;
-            }
+            } 
+
+            cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
+            reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa, arquivo);
+            verificaSolution(reativo);
+            cout << endl << endl;
             
             arquivo.close(); // Fecha o arquivo quando terminar a interação
         } else {
@@ -333,13 +322,6 @@ int main(int argc, const char* argv[])
         return 1;
         }
     }
-
-    
-
-    // cout << " --- Guloso Randomizado Reativo --- " << endl << endl;
-    reativo = grafo->gulosoRandomizadoReativoCVRP(probailidadesAlfa);
-    verificaSolution(reativo);
-    cout << endl << endl;
 
     delete grafo;
     return 0;

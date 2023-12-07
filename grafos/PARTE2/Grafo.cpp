@@ -1541,7 +1541,7 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
     if (arquivo.is_open()) { 
         arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
         arquivo << "====================================================================" << endl;
-        arquivo << "   RESULTADOS         Randomizado Alfa -    " <<  alpha << endl;
+        arquivo << "   RESULTADOS         Guloso Randomizado Alfa    " <<  alpha << endl;
         arquivo << "====================================================================" << endl;
         arquivo << "ROTAS: " << endl;
     }
@@ -1618,7 +1618,7 @@ Probabilidade* Grafo::escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeA
 }
 
 
-Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas) // Reativo com quantidade de veiculos
+Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstream& arquivo) // Reativo com quantidade de veiculos
 {
     Solution bestSolution;
     bestSolution.cost = INFINITO;
@@ -1686,14 +1686,36 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas) // Re
 
     // Imprimindo rotas
     cout << "Instancia: " << this->getInstanceName() << endl;
+     if (arquivo.is_open()) { 
+        arquivo << "Resultados Instancia " << this->getInstanceName() << " em:" << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "   RESULTADOS        Guloso Randomizado Reativo    " << endl;
+        arquivo << "====================================================================" << endl;
+        arquivo << "ROTAS: " << endl;
+    }
     for (int i = 0; i < this->numVeiculos; i++)
     {
         cout << "Rota #" << i+1 << ": ";
+        if (arquivo.is_open()) { 
+            arquivo << "Rota #" << i+1 << ": ";
+        }
         for (No *client:bestSolution.rotas[i].clientes)
         {
             cout << client->getIdNo() << " ";
+            if (arquivo.is_open()) { 
+                arquivo << client->getIdNo() << " ";
+            }
+        }
+        if (arquivo.is_open()) { 
+            arquivo << "" << endl;
         }
         cout << endl;
+    }
+    if (arquivo.is_open()) { 
+        arquivo << "Custo total: " << bestSolution.cost << endl;
+        arquivo << "" << endl;
+        arquivo << "Melhor alpha: " << bestSolution.bestAlfa << endl;
+        arquivo << "" << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl;
     cout << "Melhor aplha: " << bestSolution.bestAlfa << endl;

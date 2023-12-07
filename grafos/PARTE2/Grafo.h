@@ -115,7 +115,7 @@ class Grafo
         int encontraClienteProximo(No *clienteAtual, vector<No*> clientes);
         Solution gulosoCVRP(ofstream& arquivo);
         Solution gulosoRandomizadoCVRP(double alpha, ofstream& arquivo);
-        Solution gulosoRandomizadoReativoCVRP(vector<double> alfas);
+        Solution gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstream& arquivo);
         double calculaDistanciaRota(vector<No*> rota);
         double calculateSolutionCost(Solution &sol);
         No* encontraProxClienteAleatorio(vector<No*> clientesRestantes, No *clienteAtual, double alpha, int capacidadeUsada);
