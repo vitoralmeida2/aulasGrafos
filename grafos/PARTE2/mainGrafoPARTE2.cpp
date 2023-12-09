@@ -266,10 +266,6 @@ int main(int argc, const char* argv[])
         return 1;
     }
 
-    // for(int i=0; i<numInstancias; i++) { 
-    //     cout << vetorInstancias[i] << endl;
-    // }
-
     for(int i=0; i<numInstancias; i++) {
         ofstream arquivo(vetorInstancias[i],ios::app); // Abre o arquivo em modo de adição (append)
 
