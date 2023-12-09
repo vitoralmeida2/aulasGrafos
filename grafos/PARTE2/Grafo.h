@@ -126,6 +126,7 @@ class Grafo
         void atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida);
         void normalizarProbabilidades(vector<Probabilidade*> probabilidades);
         Probabilidade* escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeAlfa);
+        void adicionArestasDaRota(vector<Rota> rotas);
         
     private:
         int ordem;

@@ -1331,6 +1331,17 @@ double Grafo::calculaDistanciaRota(vector<No*> rota)
     return totalDistance;
 }
 
+void Grafo::adicionArestasDaRota(vector<Rota> rotas)
+{
+    double distancia = 0.0;
+    for(Rota rota : rotas) {
+        for (int i = 1; i < rota.clientes.size(); i++) {
+            distancia = distance(rota.clientes[i-1], rota.clientes[i]);
+            this->insereAresta(rota.clientes[i-1]->getIdNo(), rota.clientes[i]->getIdNo(), distancia);
+        }
+    }
+}
+
 double Grafo::calculateSolutionCost(Solution &sol)
 {
     double custoTotal = 0.0;
@@ -1439,6 +1450,8 @@ Solution Grafo::gulosoCVRP(ofstream& arquivo)
     sol.clientesRestantes = clientesRestante;
     sol.cost = calculateSolutionCost(sol);
 
+    this->adicionArestasDaRota(sol.rotas);
+
     // Imprimindo rotas
     //arquivo.open("main.cpp", ios::app);
     cout << "Instancia: " << this->getInstanceName() << endl;
@@ -1534,6 +1547,8 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
             bestSolution.clientesRestantes = solAtual.clientesRestantes;
         }
     }
+
+    this->adicionArestasDaRota(bestSolution.rotas);
 
     // Imprimindo rotas
     cout << "Instancia: " << this->getInstanceName() << endl;
@@ -1682,6 +1697,8 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
         }
     }
 
+    this->adicionArestasDaRota(bestSolution.rotas);
+
     // Imprimindo rotas
     cout << "Instancia: " << this->getInstanceName() << endl;
      if (arquivo.is_open()) { 
@@ -1763,6 +1780,8 @@ Solution Grafo::guloso(ofstream& arquivo) // Sem quantidade de veiculos, minimo 
     sol.rotas = rotas;
     sol.clientesRestantes = clientesRestante;
     sol.cost = calculateSolutionCost(sol);
+
+    this->adicionArestasDaRota(sol.rotas);
 
     // Imprimindo rotas
     //arquivo.open("main.cpp", ios::app);
@@ -1862,6 +1881,9 @@ Solution Grafo::randomizado(double alpha, ofstream& arquivo) // Sem quantidade d
             bestSolution.clientesRestantes = solAtual.clientesRestantes;
         }
     }
+
+
+    this->adicionArestasDaRota(bestSolution.rotas);
 
     // Imprimindo rotas
     int cont = 1;
@@ -1966,6 +1988,8 @@ Solution Grafo::reativo(vector<Probabilidade*> alfas, ofstream& arquivo) // Sem 
             bestSolution.bestAlfa = alfaEscolhido->alfa;
         }
     }
+
+    this->adicionArestasDaRota(bestSolution.rotas);
 
     // Imprimindo rotas
     int cont = 1;
