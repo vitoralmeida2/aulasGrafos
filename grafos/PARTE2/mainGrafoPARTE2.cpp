@@ -236,7 +236,6 @@ int main(int argc, const char* argv[])
 {
     Grafo *grafo;
     Solution guloso, randomizado, reativo;
-    double alpha = 0.3;
     vector<double> alfas = {0.05, 0.10, 0.15, 0.30, 0.50}; 
     vector<Probabilidade*> probailidadesAlfa = {
         new Probabilidade{0.05, 0.2},
