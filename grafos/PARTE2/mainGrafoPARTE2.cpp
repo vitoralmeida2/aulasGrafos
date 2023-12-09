@@ -132,7 +132,7 @@ Grafo *readFile2(string nomeArquivo)
                 string palavra, espaco, valor;
                 iss >> palavra >> espaco >> valor;
                 dimension = stoi(valor);
-                grafo = new Grafo(dimension, false, true, false);
+                grafo = new Grafo(dimension, false, true, true);
             } else if (linha.find("CAPACITY") != string::npos)
                 {
                     istringstream iss(linha);
@@ -187,7 +187,7 @@ Grafo *readFile3(string nomeArquivo)
                 string palavra, espaco, valor;
                 iss >> palavra >> espaco >> valor;
                 dimension = stoi(valor);
-                grafo = new Grafo(dimension, false, true, false);
+                grafo = new Grafo(dimension, false, true, true);
             } else if (linha.find("CAPACITY") != string::npos)
                 {
                     istringstream iss(linha);
