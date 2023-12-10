@@ -1,0 +1,286 @@
+RELATORIO FINAL COM AS ROTA DO GULOSO, RANDOMIZADO E REATIVO COM O TEMPO DE COMPILAÇÃO: 
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso   
+====================================================================
+ROTAS: 
+Rota #1: 1 33 25 47 36 1 
+Rota #2: 1 51 80 31 86 1 
+Rota #3: 1 6 16 23 42 1 
+Rota #4: 1 22 101 62 98 1 
+Rota #5: 1 24 20 12 1 
+Rota #6: 1 13 59 45 1 
+Rota #7: 1 81 18 35 65 1 
+Rota #8: 1 9 57 1 
+Rota #9: 1 32 96 1 
+Rota #10: 1 76 94 34 1 
+Rota #11: 1 95 97 4 1 
+Rota #12: 1 41 89 60 1 
+Rota #13: 1 54 74 21 2 1 
+Rota #14: 1 19 5 40 1 
+Rota #15: 1 78 15 64 29 1 
+Rota #16: 1 28 92 82 1 
+Rota #17: 1 68 61 58 73 1 
+Rota #18: 1 26 11 66 1 
+Rota #19: 1 39 27 49 88 1 
+Rota #20: 1 83 43 79 1 
+Rota #21: 1 53 84 1 
+Rota #22: 1 67 85 91 77 1 
+Rota #23: 1 69 55 93 1 
+Rota #24: 1 52 72 63 1 
+Rota #25: 1 87 10 1 
+Rota #26: 1 48 90 99 100 1 
+Rota #27: 1 14 75 70 1 
+Rota #28: 1 7 38 1 
+Rota #29: 1 56 17 1 
+Rota #30: 1 8 50 3 46 1 
+Rota #31: 1 71 37 30 1 
+Rota #32: 1 44 1 
+Custo total: 35444.3
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 35444.3
+
+Tempo decorrido: 0 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.05
+====================================================================
+ROTAS: 
+Rota #1: 1 25 33 36 23 16 77 8 66 88 1 
+Rota #2: 1 51 22 62 101 35 65 30 1 
+Rota #3: 1 80 12 31 86 34 74 1 
+Rota #4: 1 6 59 45 41 58 1 
+Rota #5: 1 47 32 21 1 
+Rota #6: 1 81 18 95 1 
+Rota #7: 1 13 40 64 15 1 
+Rota #8: 1 76 94 96 1 
+Rota #9: 1 24 20 92 1 
+Rota #10: 1 9 57 97 27 1 
+Rota #11: 1 4 89 68 48 1 
+Rota #12: 1 54 98 82 72 90 1 
+Rota #13: 1 42 87 69 46 1 
+Rota #14: 1 19 5 26 1 
+Rota #15: 1 78 61 60 73 1 
+Rota #16: 1 28 53 39 1 
+Rota #17: 1 11 29 43 1 
+Rota #18: 1 83 79 7 44 1 
+Rota #19: 1 67 85 91 10 1 
+Rota #20: 1 49 38 70 1 
+Rota #21: 1 2 71 55 1 
+Rota #22: 1 84 52 1 
+Rota #23: 1 93 56 14 1 
+Rota #24: 1 63 100 99 1 
+Rota #25: 1 75 17 1 
+Rota #26: 1 50 3 37 1 
+Custo total: 35656.6
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 35656.6
+
+Tempo decorrido: 3359 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.1
+====================================================================
+ROTAS: 
+Rota #1: 1 13 6 47 16 8 1 
+Rota #2: 1 22 24 9 35 65 58 88 1 
+Rota #3: 1 33 54 34 31 74 1 
+Rota #4: 1 81 18 41 73 30 1 
+Rota #5: 1 32 96 25 12 86 82 1 
+Rota #6: 1 36 42 67 77 70 66 1 
+Rota #7: 1 59 89 68 15 1 
+Rota #8: 1 80 76 51 1 
+Rota #9: 1 45 4 97 57 1 
+Rota #10: 1 62 28 72 48 1 
+Rota #11: 1 95 61 29 40 27 1 
+Rota #12: 1 23 21 2 85 1 
+Rota #13: 1 94 20 101 1 
+Rota #14: 1 98 53 99 90 1 
+Rota #15: 1 78 83 60 1 
+Rota #16: 1 92 84 39 1 
+Rota #17: 1 19 5 26 1 
+Rota #18: 1 11 43 44 46 1 
+Rota #19: 1 64 79 38 1 
+Rota #20: 1 49 7 50 1 
+Rota #21: 1 69 55 93 1 
+Rota #22: 1 52 63 100 1 
+Rota #23: 1 91 56 75 1 
+Rota #24: 1 87 10 14 1 
+Rota #25: 1 17 71 1 
+Rota #26: 1 37 3 1 
+Custo total: 36515.4
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 36515.4
+
+Tempo decorrido: 3326 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.15
+====================================================================
+ROTAS: 
+Rota #1: 1 25 32 36 33 1 
+Rota #2: 1 80 9 65 58 88 66 8 1 
+Rota #3: 1 59 64 60 89 35 1 
+Rota #4: 1 51 18 22 95 30 1 
+Rota #5: 1 47 42 2 91 1 
+Rota #6: 1 12 101 57 41 97 48 1 
+Rota #7: 1 13 6 23 1 
+Rota #8: 1 20 24 82 72 63 74 1 
+Rota #9: 1 81 68 15 77 1 
+Rota #10: 1 16 67 10 70 85 1 
+Rota #11: 1 96 34 54 31 1 
+Rota #12: 1 94 76 86 90 1 
+Rota #13: 1 19 26 78 1 
+Rota #14: 1 62 28 27 1 
+Rota #15: 1 92 53 39 1 
+Rota #16: 1 21 55 87 1 
+Rota #17: 1 4 83 73 29 1 
+Rota #18: 1 98 100 99 40 1 
+Rota #19: 1 45 43 7 44 46 1 
+Rota #20: 1 61 49 79 1 
+Rota #21: 1 5 14 75 1 
+Rota #22: 1 11 38 1 
+Rota #23: 1 84 52 1 
+Rota #24: 1 69 93 56 1 
+Rota #25: 1 17 71 1 
+Rota #26: 1 50 3 37 1 
+Custo total: 37465.3
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 37465.3
+
+Tempo decorrido: 3351 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.3
+====================================================================
+ROTAS: 
+Rota #1: 1 65 89 79 8 37 46 66 44 88 58 1 
+Rota #2: 1 12 20 52 82 22 1 
+Rota #3: 1 18 95 39 48 90 35 30 1 
+Rota #4: 1 34 42 67 77 70 85 1 
+Rota #5: 1 76 98 51 25 1 
+Rota #6: 1 16 96 47 23 59 1 
+Rota #7: 1 81 62 27 15 1 
+Rota #8: 1 41 60 45 26 73 1 
+Rota #9: 1 54 94 74 1 
+Rota #10: 1 32 6 33 86 72 1 
+Rota #11: 1 36 2 75 40 1 
+Rota #12: 1 97 83 78 1 
+Rota #13: 1 19 68 1 
+Rota #14: 1 9 28 1 
+Rota #15: 1 101 53 92 1 
+Rota #16: 1 64 29 4 1 
+Rota #17: 1 80 24 57 1 
+Rota #18: 1 31 63 84 1 
+Rota #19: 1 11 13 1 
+Rota #20: 1 21 93 10 1 
+Rota #21: 1 61 43 7 1 
+Rota #22: 1 49 50 3 1 
+Rota #23: 1 5 69 55 1 
+Rota #24: 1 91 17 14 1 
+Rota #25: 1 87 71 1 
+Rota #26: 1 100 99 38 1 
+Rota #27: 1 56 1 
+Custo total: 39838
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 39838
+
+Tempo decorrido: 3436 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.5
+====================================================================
+ROTAS: 
+Rota #1: 1 81 88 83 66 73 58 48 65 8 30 1 
+Rota #2: 1 92 27 101 24 86 1 
+Rota #3: 1 31 32 96 34 74 1 
+Rota #4: 1 12 16 42 70 10 77 1 
+Rota #5: 1 60 29 50 79 44 35 1 
+Rota #6: 1 40 45 98 20 22 1 
+Rota #7: 1 19 14 64 46 1 
+Rota #8: 1 21 17 15 89 1 
+Rota #9: 1 26 56 67 33 1 
+Rota #10: 1 59 4 7 90 1 
+Rota #11: 1 51 41 85 61 1 
+Rota #12: 1 68 91 47 1 
+Rota #13: 1 62 99 72 82 39 1 
+Rota #14: 1 97 49 38 1 
+Rota #15: 1 5 95 18 1 
+Rota #16: 1 11 93 2 1 
+Rota #17: 1 76 6 78 1 
+Rota #18: 1 53 9 1 
+Rota #19: 1 36 71 69 1 
+Rota #20: 1 28 52 63 1 
+Rota #21: 1 23 54 25 1 
+Rota #22: 1 57 13 55 1 
+Rota #23: 1 84 94 1 
+Rota #24: 1 43 37 1 
+Rota #25: 1 87 3 75 1 
+Rota #26: 1 80 100 1 
+Custo total: 44050
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 44050
+
+Tempo decorrido: 3479 milisegundos 
+
+
+
+Resultados Instancia 	X-n101-k25	 em:
+====================================================================
+   RESULTADOS        Guloso Randomizado Reativo    
+====================================================================
+ROTAS: 
+Rota #1: 1 6 36 21 16 77 8 66 88 65 1 
+Rota #2: 1 80 31 12 86 34 74 1 
+Rota #3: 1 47 96 25 76 33 35 1 
+Rota #4: 1 22 62 101 98 48 1 
+Rota #5: 1 13 19 40 58 30 1 
+Rota #6: 1 51 9 57 82 1 
+Rota #7: 1 59 18 81 1 
+Rota #8: 1 24 20 95 73 1 
+Rota #9: 1 32 94 1 
+Rota #10: 1 41 45 89 68 1 
+Rota #11: 1 4 60 61 1 
+Rota #12: 1 54 42 2 1 
+Rota #13: 1 23 67 91 85 1 
+Rota #14: 1 97 78 15 64 1 
+Rota #15: 1 28 92 72 90 1 
+Rota #16: 1 5 26 29 79 1 
+Rota #17: 1 11 43 44 46 1 
+Rota #18: 1 39 27 49 7 1 
+Rota #19: 1 83 38 50 1 
+Rota #20: 1 53 84 1 
+Rota #21: 1 69 55 93 1 
+Rota #22: 1 52 63 100 1 
+Rota #23: 1 87 10 70 1 
+Rota #24: 1 14 75 56 1 
+Rota #25: 1 99 37 3 1 
+Rota #26: 1 17 71 1 
+Custo total: 36296.1
+Melhor alpha: 0.05
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 36296.1
+
+Tempo decorrido: 3404 milisegundos 

@@ -1,0 +1,167 @@
+RELATORIO FINAL COM AS ROTA DO GULOSO, RANDOMIZADO E REATIVO COM O TEMPO DE COMPILAÇÃO: 
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso   
+====================================================================
+ROTAS: 
+Rota #1: 1 21 22 23 24 27 29 28 26 25 30 31 35 37 1 
+Rota #2: 1 68 66 64 63 67 70 69 65 62 73 75 1 
+Rota #3: 1 6 4 5 7 9 10 12 11 8 76 2 3 99 1 
+Rota #4: 1 44 43 42 41 45 46 47 49 51 52 53 50 48 32 1 
+Rota #5: 1 91 90 89 86 85 84 83 87 88 92 97 1 
+Rota #6: 1 14 18 19 20 16 17 15 13 1 
+Rota #7: 1 33 34 36 38 39 40 60 58 1 
+Rota #8: 1 100 101 98 94 93 95 96 82 1 
+Rota #9: 1 56 55 54 57 59 61 81 80 78 74 1 
+Rota #10: 1 79 77 72 71 1 
+Custo total: 1146.38
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 1146.38
+
+Tempo decorrido: 0 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.05
+====================================================================
+ROTAS: 
+Rota #1: 1 23 24 29 28 25 27 26 30 31 35 33 37 1 
+Rota #2: 1 66 63 62 65 73 67 68 70 69 42 41 46 49 47 48 44 50 1 
+Rota #3: 1 21 22 11 8 5 4 76 3 7 6 9 10 12 1 
+Rota #4: 1 64 91 88 87 85 84 83 89 86 1 
+Rota #5: 1 43 45 52 51 32 36 34 39 38 40 53 1 
+Rota #6: 1 2 99 97 96 95 94 93 98 101 100 1 
+Rota #7: 1 75 56 58 60 55 54 57 1 
+Rota #8: 1 92 90 82 79 77 72 71 74 78 80 81 59 1 
+Rota #9: 1 14 18 19 20 16 17 15 13 1 
+Rota #10: 1 61 1 
+Custo total: 1088.96
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 1088.96
+
+Tempo decorrido: 4810 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.1
+====================================================================
+ROTAS: 
+Rota #1: 1 24 23 22 29 27 21 50 48 46 47 43 52 41 45 1 
+Rota #2: 1 25 26 33 35 37 32 36 30 31 19 20 11 1 
+Rota #3: 1 70 67 62 75 68 65 64 66 73 56 60 42 1 
+Rota #4: 1 4 5 6 7 3 8 9 12 18 14 13 1 
+Rota #5: 1 44 69 49 51 28 10 76 92 88 87 86 84 89 90 1 
+Rota #6: 1 2 99 96 98 97 100 94 93 95 101 1 
+Rota #7: 1 63 58 55 54 59 61 57 1 
+Rota #8: 1 91 85 83 82 79 77 72 71 74 78 80 81 1 
+Rota #9: 1 53 34 38 39 40 16 17 1 
+Rota #10: 1 15 1 
+Custo total: 1260.45
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 1260.45
+
+Tempo decorrido: 4609 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.15
+====================================================================
+ROTAS: 
+Rota #1: 1 6 12 3 101 95 2 76 10 5 14 9 7 1 
+Rota #2: 1 68 64 66 69 75 44 49 52 41 50 51 48 1 
+Rota #3: 1 70 65 45 43 67 62 63 46 53 28 26 29 22 1 
+Rota #4: 1 21 42 25 24 35 37 39 36 31 34 30 32 27 1 
+Rota #5: 1 23 11 8 99 93 96 98 89 92 90 1 
+Rota #6: 1 88 91 85 86 84 87 97 100 94 15 20 19 1 
+Rota #7: 1 73 56 60 59 61 54 57 58 33 1 
+Rota #8: 1 4 13 17 16 18 38 40 47 1 
+Rota #9: 1 83 82 79 77 72 71 74 78 80 81 1 
+Rota #10: 1 55 1 
+Custo total: 1473.29
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 1473.29
+
+Tempo decorrido: 4628 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.3
+====================================================================
+ROTAS: 
+Rota #1: 1 50 65 42 62 46 64 70 52 49 58 54 44 1 
+Rota #2: 1 68 67 47 43 29 31 28 37 51 60 57 41 53 36 1 
+Rota #3: 1 26 35 40 24 30 18 17 16 1 
+Rota #4: 1 76 7 23 27 25 11 99 89 84 96 101 1 
+Rota #5: 1 21 10 3 9 13 8 12 2 86 87 63 69 1 
+Rota #6: 1 5 6 97 94 95 90 98 93 85 66 4 92 73 1 
+Rota #7: 1 34 22 14 20 39 33 19 15 48 1 
+Rota #8: 1 75 83 79 78 81 74 72 82 80 77 91 1 
+Rota #9: 1 88 71 56 59 61 55 45 32 38 1 
+Rota #10: 1 100 1 
+Custo total: 2009.74
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 2009.74
+
+Tempo decorrido: 4676 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS         Guloso Randomizado Alfa    0.5
+====================================================================
+ROTAS: 
+Rota #1: 1 46 25 6 24 20 15 13 10 14 76 4 85 91 68 65 1 
+Rota #2: 1 45 41 58 69 30 48 70 2 84 88 89 90 9 1 
+Rota #3: 1 63 83 3 44 52 37 43 21 35 53 50 27 66 42 1 
+Rota #4: 1 47 64 86 97 96 99 101 100 1 
+Rota #5: 1 56 26 49 62 61 73 78 82 92 75 1 
+Rota #6: 1 5 87 98 8 23 19 7 34 39 1 
+Rota #7: 1 29 33 36 59 55 54 67 81 74 93 1 
+Rota #8: 1 51 32 31 28 17 95 16 11 22 18 12 1 
+Rota #9: 1 57 80 79 71 77 72 60 38 40 1 
+Rota #10: 1 94 1 
+Custo total: 2501.67
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 2501.67
+
+Tempo decorrido: 5317 milisegundos 
+
+
+
+Resultados Instancia M-n101-k10 em:
+====================================================================
+   RESULTADOS        Guloso Randomizado Reativo    
+====================================================================
+ROTAS: 
+Rota #1: 1 21 25 30 28 26 29 31 23 11 10 12 8 6 4 1 
+Rota #2: 1 24 9 7 76 5 3 100 99 95 93 96 1 
+Rota #3: 1 22 27 50 53 52 49 47 45 43 42 44 46 41 51 32 1 
+Rota #4: 1 68 64 63 67 70 65 69 73 62 75 66 1 
+Rota #5: 1 2 97 98 101 92 91 90 88 89 86 85 1 
+Rota #6: 1 48 33 34 35 37 40 39 38 36 60 1 
+Rota #7: 1 87 84 83 82 79 77 72 71 74 78 80 81 56 1 
+Rota #8: 1 14 18 19 20 16 17 15 13 1 
+Rota #9: 1 58 55 54 57 59 61 1 
+Rota #10: 1 94 1 
+Custo total: 1130.38
+Melhor alpha: 0.05
+
+Solucao valida, todos clientes atendidos!
+Custo total da solucao: 1130.38
+
+Tempo decorrido: 5121 milisegundos 
