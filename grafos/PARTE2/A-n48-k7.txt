@@ -37,7 +37,7 @@ Custo total: 1384.39
 Solucao valida, todos clientes atendidos!
 Custo total da solucao: 1384.39
 
-Tempo decorrido: 870 milisegundos 
+Tempo decorrido: 665 milisegundos 
 
 
 
@@ -46,19 +46,19 @@ Resultados Instancia A-n48-k7 em:
    RESULTADOS         Guloso Randomizado Alfa    0.1
 ====================================================================
 ROTAS: 
-Rota #1: 1 45 36 24 44 6 13 32 23 33 1 
-Rota #2: 1 15 17 11 34 31 22 1 
-Rota #3: 1 19 37 8 46 28 16 1 
-Rota #4: 1 18 42 3 29 30 25 5 14 47 1 
-Rota #5: 1 41 35 10 43 12 9 40 27 21 1 
-Rota #6: 1 48 38 20 39 26 4 1 
-Rota #7: 1 7 2 1 
-Custo total: 1326.09
+Rota #1: 1 18 48 29 10 30 22 14 5 12 43 8 1 
+Rota #2: 1 19 15 36 33 37 41 46 1 
+Rota #3: 1 45 24 44 32 13 6 2 1 
+Rota #4: 1 42 3 34 11 17 1 
+Rota #5: 1 7 23 39 20 26 38 4 1 
+Rota #6: 1 35 28 16 9 40 27 21 1 
+Rota #7: 1 31 47 25 1 
+Custo total: 1295.69
 
 Solucao valida, todos clientes atendidos!
-Custo total da solucao: 1326.09
+Custo total da solucao: 1295.69
 
-Tempo decorrido: 899 milisegundos 
+Tempo decorrido: 672 milisegundos 
 
 
 
@@ -67,19 +67,19 @@ Resultados Instancia A-n48-k7 em:
    RESULTADOS         Guloso Randomizado Alfa    0.15
 ====================================================================
 ROTAS: 
-Rota #1: 1 44 7 6 23 2 24 32 1 
-Rota #2: 1 19 45 18 42 3 11 1 
-Rota #3: 1 15 41 46 35 10 16 9 28 1 
-Rota #4: 1 17 29 22 31 14 5 25 43 12 30 1 
-Rota #5: 1 13 36 33 37 8 38 39 1 
-Rota #6: 1 48 34 47 40 27 21 1 
-Rota #7: 1 20 26 4 1 
-Custo total: 1407.12
+Rota #1: 1 36 33 39 4 21 9 43 25 14 5 30 35 8 1 
+Rota #2: 1 19 45 24 6 13 32 23 1 
+Rota #3: 1 15 42 17 11 3 29 1 
+Rota #4: 1 41 46 28 16 40 12 27 1 
+Rota #5: 1 44 2 7 20 26 10 1 
+Rota #6: 1 18 48 34 22 31 47 1 
+Rota #7: 1 37 38 1 
+Custo total: 1414
 
 Solucao valida, todos clientes atendidos!
-Custo total da solucao: 1407.12
+Custo total da solucao: 1414
 
-Tempo decorrido: 853 milisegundos 
+Tempo decorrido: 658 milisegundos 
 
 
 
@@ -88,19 +88,19 @@ Resultados Instancia A-n48-k7 em:
    RESULTADOS         Guloso Randomizado Alfa    0.3
 ====================================================================
 ROTAS: 
-Rota #1: 1 41 46 16 12 25 31 22 29 35 30 8 1 
-Rota #2: 1 45 36 33 20 38 9 43 5 4 1 
-Rota #3: 1 18 17 3 34 48 15 1 
-Rota #4: 1 19 32 6 24 7 44 1 
-Rota #5: 1 13 37 39 26 28 10 1 
-Rota #6: 1 2 23 27 40 21 14 47 1 
+Rota #1: 1 19 15 33 20 26 38 4 8 1 
+Rota #2: 1 32 23 2 7 44 13 24 1 
+Rota #3: 1 48 29 46 9 21 43 14 31 30 1 
+Rota #4: 1 36 6 45 41 35 16 27 40 1 
+Rota #5: 1 17 18 3 34 47 22 1 
+Rota #6: 1 37 28 10 25 5 12 39 1 
 Rota #7: 1 42 11 1 
-Custo total: 1547.29
+Custo total: 1555.78
 
 Solucao valida, todos clientes atendidos!
-Custo total da solucao: 1547.29
+Custo total da solucao: 1555.78
 
-Tempo decorrido: 846 milisegundos 
+Tempo decorrido: 664 milisegundos 
 
 
 
@@ -109,19 +109,19 @@ Resultados Instancia A-n48-k7 em:
    RESULTADOS         Guloso Randomizado Alfa    0.5
 ====================================================================
 ROTAS: 
-Rota #1: 1 6 24 45 7 38 4 33 8 1 
-Rota #2: 1 48 17 31 22 34 29 30 10 1 
-Rota #3: 1 46 40 43 21 9 28 14 25 1 
-Rota #4: 1 36 44 13 32 18 37 41 1 
-Rota #5: 1 15 2 35 16 20 23 19 1 
-Rota #6: 1 42 3 5 47 12 11 1 
-Rota #7: 1 39 26 27 1 
-Custo total: 1805.79
+Rota #1: 1 7 2 41 23 20 38 8 1 
+Rota #2: 1 24 6 4 25 34 22 43 30 9 1 
+Rota #3: 1 44 39 21 40 47 12 5 35 33 1 
+Rota #4: 1 13 26 46 17 48 32 1 
+Rota #5: 1 29 28 37 36 45 15 18 1 
+Rota #6: 1 3 11 10 14 31 16 27 1 
+Rota #7: 1 19 42 1 
+Custo total: 1819.36
 
 Solucao valida, todos clientes atendidos!
-Custo total da solucao: 1805.79
+Custo total da solucao: 1819.36
 
-Tempo decorrido: 852 milisegundos 
+Tempo decorrido: 672 milisegundos 
 
 
 
@@ -130,17 +130,17 @@ Resultados Instancia A-n48-k7 em:
    RESULTADOS        Guloso Randomizado Reativo    
 ====================================================================
 ROTAS: 
-Rota #1: 1 19 36 33 37 41 8 38 32 1 
-Rota #2: 1 15 18 17 48 11 30 35 1 
-Rota #3: 1 45 24 44 6 2 7 1 
-Rota #4: 1 42 3 34 22 31 14 5 25 43 1 
-Rota #5: 1 13 23 39 20 26 4 40 27 1 
-Rota #6: 1 46 28 16 9 21 12 1 
-Rota #7: 1 29 10 47 1 
-Custo total: 1384.39
-Melhor alpha: 0.05
+Rota #1: 1 45 36 19 24 13 6 1 
+Rota #2: 1 44 32 7 2 33 37 8 41 1 
+Rota #3: 1 18 42 17 29 30 31 22 14 25 1 
+Rota #4: 1 15 48 3 34 47 5 43 35 1 
+Rota #5: 1 23 39 20 26 38 4 40 10 1 
+Rota #6: 1 46 28 16 9 27 21 1 
+Rota #7: 1 11 12 1 
+Custo total: 1383.34
+Melhor alpha: 0.1
 
 Solucao valida, todos clientes atendidos!
-Custo total da solucao: 1384.39
+Custo total da solucao: 1383.34
 
-Tempo decorrido: 838 milisegundos 
+Tempo decorrido: 1989 milisegundos 

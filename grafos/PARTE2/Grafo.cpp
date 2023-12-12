@@ -1572,18 +1572,17 @@ Solution Grafo::gulosoRandomizadoCVRP(double alpha, ofstream& arquivo)
 
 /* ===========================================================================================================================*/
 
-void Grafo::atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida) {
-    bool aumentaProb = false;
-    if(valida && (distanciaRota < (melhorDistanciaTotal + 20))) {
-        aumentaProb = true;
+void Grafo::atualizarProbabilidade(Bloco bloco, vector<Probabilidade*> alfas) {
+    // Calcular cada qi
+    double somaQi = 0;
+    for(QualidadeAlfa* alfa : bloco.qualidadeAlfa) {
+        alfa->qi = bloco.bestSol.cost / (alfa->soma / alfa->quantidadeElementos);
+        somaQi += alfa->qi;
     }
 
-    if(aumentaProb && (distanciaRota < melhorDistanciaTotal)) {
-        alfaAtual->probabilidade = alfaAtual->probabilidade * 1.3;
-    } else if (valida && aumentaProb) {
-        alfaAtual->probabilidade = alfaAtual->probabilidade * 1.1; // Aumenta a probabilidade em 10%
-    } else {
-        alfaAtual->probabilidade = alfaAtual->probabilidade * 0.9;  // Diminui a probabilidade em 10%
+    // probabilidadei =  qi / soma dos qi
+    for(int i = 0; i < bloco.qualidadeAlfa.size(); ++i) {
+        alfas[i]->probabilidade = bloco.qualidadeAlfa[i]->qi / somaQi;
     }
 }
 
@@ -1615,6 +1614,16 @@ Probabilidade* Grafo::escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeA
     return nullptr;
 }
 
+Bloco Grafo::inicializaBloco(vector<Probabilidade*> alfas) {
+    Bloco bloco;
+    bloco.bestSol.cost = numeric_limits<double>::infinity();
+    for(Probabilidade* alfa : alfas) {
+        bloco.qualidadeAlfa.push_back(new QualidadeAlfa({alfa->alfa, 0, 0}));
+    }
+
+    return bloco;
+}
+
 
 Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstream& arquivo) // Reativo com quantidade de veiculos
 {
@@ -1622,64 +1631,81 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
-    {
-        Solution solAtual;
-        vector<No*> clientesRestante = clientes;
-        setNosNaoVisitados(clientesRestante);
-        vector<Rota> rotas(this->getVeiculos());
-        Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
+    for (int itBloco = 0; itBloco < 10; itBloco++) {
+        Bloco bloco = inicializaBloco(alfas);
+        for(int it = 0; it < 300; it++) {
+            Solution solAtual;
+            vector<No*> clientesRestante = clientes;
+            setNosNaoVisitados(clientesRestante);
+            vector<Rota> rotas(this->getVeiculos());
+            Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
 
-        for (int i = 0; i < this->getVeiculos(); i++)
-        {
-            Rota &rotaTemp = rotas[i];
-            rotaTemp.capacityUsed = 0;
-
-            // Iniciando no deposito
-            rotaTemp.clientes.push_back(clientesRestante[0]);
-            clientesRestante[0]->setVisitado(true);
-
-            while (true)
+            for (int i = 0; i < this->getVeiculos(); i++)
             {
-                // Escolhendo aleatoriamente um cliente proximo nao visitado
-                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
+                Rota &rotaTemp = rotas[i];
+                rotaTemp.capacityUsed = 0;
 
-                if (randomClient == NULL)
-                    break; // nao ha clientes nao visitados
+                // Iniciando no deposito
+                rotaTemp.clientes.push_back(clientesRestante[0]);
+                clientesRestante[0]->setVisitado(true);
 
-                // testando capacidade
-                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
+                while (true)
                 {
-                    rotaTemp.capacityUsed += randomClient->getPeso();
-                    rotaTemp.clientes.push_back(randomClient);
-                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
-                        return no->getIdNo() == randomClient->getIdNo();
-                    }), clientesRestante.end());
-                    randomClient->setVisitado(true);
-                } else
+                    // Escolhendo aleatoriamente um cliente proximo nao visitado
+                    No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
+
+                    if (randomClient == NULL)
+                        break; // nao ha clientes nao visitados
+
+                    // testando capacidade
+                    if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                     {
-                        break; // rota cheia passa pro proximo veiculo
-                    }
+                        rotaTemp.capacityUsed += randomClient->getPeso();
+                        rotaTemp.clientes.push_back(randomClient);
+                        clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                            return no->getIdNo() == randomClient->getIdNo();
+                        }), clientesRestante.end());
+                        randomClient->setVisitado(true);
+                    } else
+                        {
+                            break; // rota cheia passa pro proximo veiculo
+                        }
+                }
+                // adicionando retorno ao deposito
+                rotaTemp.clientes.push_back(clientes[0]);
             }
-            // adicionando retorno ao deposito
-            rotaTemp.clientes.push_back(clientes[0]);
+
+            // comparando solucao atual com a melhor solucao
+            solAtual.rotas = rotas;
+            solAtual.clientesRestantes = clientesRestante;
+            solAtual.cost = calculateSolutionCost(solAtual);
+
+            // this->atualizarProbabilidade(alfaEscolhido, bestSolution.cost, solAtual.cost, solAtual.clientesRestantes.size() == 1);
+            if(solAtual.clientesRestantes.size() == 1) {    
+                for(QualidadeAlfa* alfa : bloco.qualidadeAlfa) {
+                    if(alfa->alfa == alfaEscolhido->alfa) {
+                        alfa->quantidadeElementos += 1;
+                        alfa->soma += solAtual.cost;
+                    }
+                }
+
+                if(bloco.bestSol.cost > solAtual.cost) {
+                    bloco.bestSol = solAtual;
+                }
+            }
+
+            
+            if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
+            {
+                bestSolution.cost = solAtual.cost;
+                bestSolution.rotas = solAtual.rotas;
+                bestSolution.clientesRestantes = solAtual.clientesRestantes;
+                bestSolution.bestAlfa = alfaEscolhido->alfa;
+            }
         }
 
-        // comparando solucao atual com a melhor solucao
-        solAtual.rotas = rotas;
-        solAtual.clientesRestantes = clientesRestante;
-        solAtual.cost = calculateSolutionCost(solAtual);
-
-        this->atualizarProbabilidade(alfaEscolhido, bestSolution.cost, solAtual.cost, solAtual.clientesRestantes.size() == 1);
-        normalizarProbabilidades(alfas);
-
-        if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
-        {
-            bestSolution.cost = solAtual.cost;
-            bestSolution.rotas = solAtual.rotas;
-            bestSolution.clientesRestantes = solAtual.clientesRestantes;
-            bestSolution.bestAlfa = alfaEscolhido->alfa;
-        }
+        // Terminou as iterações do bloco, fazer função de calcular probabilidades
+        this->atualizarProbabilidade(bloco, alfas);
     }
 
     // Imprimindo rotas
@@ -1714,7 +1740,7 @@ Solution Grafo::gulosoRandomizadoReativoCVRP(vector<Probabilidade*> alfas, ofstr
         arquivo << "Melhor alpha: " << bestSolution.bestAlfa << endl;
     }
     cout << "Custo total: " << bestSolution.cost << endl;
-    cout << "Melhor aplha: " << bestSolution.bestAlfa << endl;
+    cout << "Melhor alpha: " << bestSolution.bestAlfa << endl;
 
     return bestSolution;
 }
@@ -1906,65 +1932,79 @@ Solution Grafo::reativo(vector<Probabilidade*> alfas, ofstream& arquivo) // Sem 
     bestSolution.cost = INFINITO;
     vector<No*> clientes = this->getNos();
 
-    for (int exec = 0; exec < 1000; exec++) // numero de execucoes do algoritmo
-    {
-        Solution solAtual;
-        vector<No*> clientesRestante = clientes;
-        setNosNaoVisitados(clientesRestante);
-        vector<Rota> rotas(this->getVeiculos());
-        Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
+    for (int itBloco = 0; itBloco < 10; itBloco++) {
+        Bloco bloco = inicializaBloco(alfas);
+        for (int it = 0; it < 300; it++) {
+            Solution solAtual;
+            vector<No*> clientesRestante = clientes;
+            setNosNaoVisitados(clientesRestante);
+            vector<Rota> rotas(this->getVeiculos());
+            Probabilidade* alfaEscolhido = this->escolheAlfaAleatorio(alfas);
 
-        while (clientesRestante.size() > 1)
-        {
-            Rota rotaTemp;
-            rotaTemp.capacityUsed = 0;
-
-            // Iniciando no deposito
-            rotaTemp.clientes.push_back(clientesRestante[0]);
-            clientesRestante[0]->setVisitado(true);
-
-            while (rotaTemp.capacityUsed <= this->getCapacidade())
+            while (clientesRestante.size() > 1)
             {
-                // Escolhendo aleatoriamente um cliente proximo nao visitado
-                No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
+                Rota rotaTemp;
+                rotaTemp.capacityUsed = 0;
 
-                if (randomClient == NULL)
-                    break; // nao ha clientes nao visitados
+                // Iniciando no deposito
+                rotaTemp.clientes.push_back(clientesRestante[0]);
+                clientesRestante[0]->setVisitado(true);
 
-                // testando capacidade
-                if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
+                while (rotaTemp.capacityUsed <= this->getCapacidade())
                 {
-                    rotaTemp.capacityUsed += randomClient->getPeso();
-                    rotaTemp.clientes.push_back(randomClient);
-                    clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
-                        return no->getIdNo() == randomClient->getIdNo();
-                    }), clientesRestante.end());
-                    randomClient->setVisitado(true);
-                } else
+                    // Escolhendo aleatoriamente um cliente proximo nao visitado
+                    No* randomClient = encontraProxClienteAleatorio(clientesRestante, rotaTemp.clientes.back(), alfaEscolhido->alfa, rotaTemp.capacityUsed);
+
+                    if (randomClient == NULL)
+                        break; // nao ha clientes nao visitados
+
+                    // testando capacidade
+                    if (rotaTemp.capacityUsed + randomClient->getPeso() <= this->getCapacidade())
                     {
-                        break; // rota cheia passa pro proximo veiculo
-                    }
+                        rotaTemp.capacityUsed += randomClient->getPeso();
+                        rotaTemp.clientes.push_back(randomClient);
+                        clientesRestante.erase(remove_if(clientesRestante.begin(), clientesRestante.end(), [randomClient](No* no) {
+                            return no->getIdNo() == randomClient->getIdNo();
+                        }), clientesRestante.end());
+                        randomClient->setVisitado(true);
+                    } else
+                        {
+                            break; // rota cheia passa pro proximo veiculo
+                        }
+                }
+                // adicionando retorno ao deposito
+                rotaTemp.clientes.push_back(clientes[0]);
+                rotas.push_back(rotaTemp);
             }
-            // adicionando retorno ao deposito
-            rotaTemp.clientes.push_back(clientes[0]);
-            rotas.push_back(rotaTemp);
+
+            // comparando solucao atual com a melhor solucao
+            solAtual.rotas = rotas;
+            solAtual.clientesRestantes = clientesRestante;
+            solAtual.cost = calculateSolutionCost(solAtual);
+
+            if(solAtual.clientesRestantes.size() == 1) {    
+                for(QualidadeAlfa* alfa : bloco.qualidadeAlfa) {
+                    if(alfa->alfa == alfaEscolhido->alfa) {
+                        alfa->quantidadeElementos += 1;
+                        alfa->soma += solAtual.cost;
+                    }
+                }
+
+                if(bloco.bestSol.cost > solAtual.cost) {
+                    bloco.bestSol = solAtual;
+                }
+            }
+
+            if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
+            {
+                bestSolution.cost = solAtual.cost;
+                bestSolution.rotas = solAtual.rotas;
+                bestSolution.clientesRestantes = solAtual.clientesRestantes;
+                bestSolution.bestAlfa = alfaEscolhido->alfa;
+            }
         }
-
-        // comparando solucao atual com a melhor solucao
-        solAtual.rotas = rotas;
-        solAtual.clientesRestantes = clientesRestante;
-        solAtual.cost = calculateSolutionCost(solAtual);
-
-        this->atualizarProbabilidade(alfaEscolhido, bestSolution.cost, solAtual.cost, solAtual.clientesRestantes.size() == 1);
-        normalizarProbabilidades(alfas);
-
-        if (solAtual.cost < bestSolution.cost && solAtual.clientesRestantes.size() == 1) // se solucao atual tem o custo menor que a melhor solucao e se tem como clientes restantes somete o deposito
-        {
-            bestSolution.cost = solAtual.cost;
-            bestSolution.rotas = solAtual.rotas;
-            bestSolution.clientesRestantes = solAtual.clientesRestantes;
-            bestSolution.bestAlfa = alfaEscolhido->alfa;
-        }
+        // Terminou as iterações do bloco, fazer função de calcular probabilidades
+        this->atualizarProbabilidade(bloco, alfas);
     }
 
     // Imprimindo rotas

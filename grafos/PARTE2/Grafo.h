@@ -43,6 +43,18 @@ struct Probabilidade {
     double probabilidade;
 };
 
+struct QualidadeAlfa {
+    double alfa;
+    double soma;
+    double quantidadeElementos;
+    double qi;
+};
+
+struct Bloco{
+    Solution bestSol;
+    vector<QualidadeAlfa*> qualidadeAlfa;
+};
+
 class Grafo 
 {
     public:
@@ -123,10 +135,13 @@ class Grafo
         Solution guloso(ofstream& arquivo);
         Solution randomizado(double alpha, ofstream& arquivo);
         Solution reativo(vector<Probabilidade*> alfas, ofstream& arquivo);
-        void atualizarProbabilidade(Probabilidade* alfaAtual, double melhorDistanciaTotal, double distanciaRota, bool valida);
+        void atualizarProbabilidade(Bloco bloco, vector<Probabilidade*> alfas);
         void normalizarProbabilidades(vector<Probabilidade*> probabilidades);
         Probabilidade* escolheAlfaAleatorio(vector<Probabilidade*> probabilidadeAlfa);
         void adicionArestasDaRota(vector<Rota> rotas);
+
+
+        Bloco inicializaBloco(vector<Probabilidade*> alfas);
         
     private:
         int ordem;
